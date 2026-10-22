@@ -96,16 +96,16 @@ const themes=[
  {pair:['C','K'],tension:'你重视回应，也会照顾相处的温度。可以留意：为了让大家舒服，你有没有太快答应，来不及听见自己真正的偏好？',fatigue:'当维持气氛总由你负责，你可能很难分清“我愿意”和“我怕让人失望”。',action:'下次答应之前，给自己一句“让我想一会儿，再回复你”。'},
  {pair:['R','O'],tension:'你喜欢理解更深的意义，也愿意保留不同的可能。可以留意：你是否等到想得足够完整，才允许自己开始一次很小的尝试？',fatigue:'当每件小事都需要一个完整解释，思考可能挤占亲身体验的空间。',action:'选一个没有想透的念头，只做十分钟，暂时不评价它。'},
  {pair:['S','A'],tension:'你重视自己的节奏，也喜欢让事情有着落。可以留意：只有把清单完成，你才觉得自己有资格休息吗？',fatigue:'若每次变化都意味着要重新掌握全部安排，日常的小意外也会额外耗费力气。',action:'今天留一件不紧急的小事到明天，先做一件让身体舒服的事。'},
- {pair:['O','C'],name:'星图温室',en:'THE STARLIGHT GREENHOUSE',image:'apple-courtyard',line:'每一颗好奇心，都可以慢慢发芽。',tension:'你容易被新可能与新相遇点亮。可以留意：为了不错过任何一条路，你是否迟迟没把时间真正留给眼前这一条？',fatigue:'当每一个新邀请都值得尝试，日程可能越来越满，心却没有落脚处。',action:'为一个最想尝试的方向，留半小时不被其他新想法打断的时间。'},
- {pair:['R','S'],name:'琥珀钟屋',en:'THE AMBER CLOCK HOUSE',image:'rainy-attic',line:'珍贵的时光，可以留下，也可以流动。',tension:'你珍惜经验，也喜欢事物之间有连续的线索。可以留意：为了不辜负过去，你是否把某个已经不合适的安排留得太久？',fatigue:'当每次改变都像在告别一个重要的自己，决定会变得格外沉重。',action:'留下一件能代表回忆的小物，同时放下一条已经不适合现在的规矩。'},
- {pair:['O','K'],name:'雾溪木屋',en:'THE MISTY CREEK CABIN',image:'apple-courtyard',line:'溪水会转弯，你也可以有自己的方向。',tension:'你愿意接住变化，也能留意沿途的需要。可以留意：当你总能适应环境时，是否反而少问了一句“我自己想往哪里走”？',fatigue:'若每次转弯都由新的需要决定，灵活也可能变成不断调整自己。',action:'做下一个小决定前，先写一句不需要迁就任何人的偏好。'},
- {pair:['C','S'],name:'山雀驿站',en:'THE SPARROW WAYSTATION',image:'bread-garden',line:'把人们聚在一起，也为自己留一个座位。',tension:'你会把人与安排连接起来，让事情向前推进。可以留意：当没有人需要你组织或回应时，你是否仍能自在地待在其中？',fatigue:'若每段关系都需要你主动维系、每次相聚都等你安排，陪伴也可能像值班。',action:'参加一次不用由你安排的相聚，允许自己只是其中一个人。'},
- {pair:['A','K'],name:'银蕨庭院',en:'THE SILVER FERN GARDEN',image:'rose-tearoom',line:'门可以由你打开，温柔也可以有边界。',tension:'你愿意关心别人，也珍惜自己的空间。可以留意：有时你是否用独自承担来守住边界，让想靠近的人不知道怎样帮你？',fatigue:'当“自己处理最省事”成为唯一选择，你可能需要照料很多，却很少被照料。',action:'挑一件风险很小的事，告诉信任的人你愿意接受哪一种帮助。'},
- {pair:['O','S'],name:'萤火工坊',en:'THE FIREFLY WORKSHOP',image:'moonlit-library',line:'把心里的微光，做成可以触摸的东西。',tension:'你既喜欢新想法，也希望亲手把它做出来。可以留意：你是否想先做得像样，才愿意让别人看到尚未完成的过程？',fatigue:'若每次尝试都同时背着新意与完成度的要求，原本的好奇会变得紧绷。',action:'给一个未完成的小作品找位观众，明确告诉对方你只想分享过程。'}
+ {pair:['O','C'],name:'星图温室',en:'THE STARLIGHT GREENHOUSE',image:'starlight-greenhouse',imageAlt:'玻璃温室里种着绿植与花朵，星图和小望远镜迎着夜空',color:'#8294a1',line:'每一颗好奇心，都可以慢慢发芽。',tension:'你容易被新可能与新相遇点亮。可以留意：为了不错过任何一条路，你是否迟迟没把时间真正留给眼前这一条？',fatigue:'当每一个新邀请都值得尝试，日程可能越来越满，心却没有落脚处。',action:'为一个最想尝试的方向，留半小时不被其他新想法打断的时间。'},
+ {pair:['R','S'],name:'琥珀钟屋',en:'THE AMBER CLOCK HOUSE',image:'amber-clock-house',imageAlt:'石砌钟屋的拱门里透出琥珀色灯光，旧钟与纪念匣静静等待',color:'#ae916b',line:'珍贵的时光，可以留下，也可以流动。',tension:'你珍惜经验，也喜欢事物之间有连续的线索。可以留意：为了不辜负过去，你是否把某个已经不合适的安排留得太久？',fatigue:'当每次改变都像在告别一个重要的自己，决定会变得格外沉重。',action:'留下一件能代表回忆的小物，同时放下一条已经不适合现在的规矩。'},
+ {pair:['O','K'],name:'雾溪木屋',en:'THE MISTY CREEK CABIN',image:'misty-creek-cabin',imageAlt:'薄雾中的小溪流过木屋，苔藓小桥通向亮着暖灯的窗',color:'#8aa299',line:'溪水会转弯，你也可以有自己的方向。',tension:'你愿意接住变化，也能留意沿途的需要。可以留意：当你总能适应环境时，是否反而少问了一句“我自己想往哪里走”？',fatigue:'若每次转弯都由新的需要决定，灵活也可能变成不断调整自己。',action:'做下一个小决定前，先写一句不需要迁就任何人的偏好。'},
+ {pair:['C','S'],name:'山雀驿站',en:'THE SPARROW WAYSTATION',image:'sparrow-waystation',imageAlt:'岔路旁的驿站有长桌和旅人的座椅，山雀停在门前的木篱上',color:'#b39a73',line:'把人们聚在一起，也为自己留一个座位。',tension:'你会把人与安排连接起来，让事情向前推进。可以留意：当没有人需要你组织或回应时，你是否仍能自在地待在其中？',fatigue:'若每段关系都需要你主动维系、每次相聚都等你安排，陪伴也可能像值班。',action:'参加一次不用由你安排的相聚，允许自己只是其中一个人。'},
+ {pair:['A','K'],name:'银蕨庭院',en:'THE SILVER FERN GARDEN',image:'silver-fern-garden',imageAlt:'半开的铁艺门后，银绿蕨叶和白花围着安静的小院与暖窗',color:'#829d91',line:'门可以由你打开，温柔也可以有边界。',tension:'你愿意关心别人，也珍惜自己的空间。可以留意：有时你是否用独自承担来守住边界，让想靠近的人不知道怎样帮你？',fatigue:'当“自己处理最省事”成为唯一选择，你可能需要照料很多，却很少被照料。',action:'挑一件风险很小的事，告诉信任的人你愿意接受哪一种帮助。'},
+ {pair:['O','S'],name:'萤火工坊',en:'THE FIREFLY WORKSHOP',image:'firefly-workshop',imageAlt:'林间工坊的木桌上留着未完成的手作，萤火围着亮灯的门廊',color:'#aa9a63',line:'把心里的微光，做成可以触摸的东西。',tension:'你既喜欢新想法，也希望亲手把它做出来。可以留意：你是否想先做得像样，才愿意让别人看到尚未完成的过程？',fatigue:'若每次尝试都同时背着新意与完成度的要求，原本的好奇会变得紧绷。',action:'给一个未完成的小作品找位观众，明确告诉对方你只想分享过程。'}
 ];
 export const HOMES=themes.map((theme,index)=>{
  const base=originalHomes[index<6?index:0];
- return {...base,...theme,imageAlt:originalHomes.find(h=>h.image===(theme.image||base.image)).imageAlt};
+ return {...base,...theme,imageAlt:theme.imageAlt||base.imageAlt};
 });
 export function analyze(answers){
  const route=buildRoute(answers);
