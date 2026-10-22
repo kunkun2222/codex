@@ -26,7 +26,8 @@ npm run preview
 
 - `src/main.js`：题目、结果、多个倾向累积的趣味计分、页面交互与分享卡绘制。
 - `src/style.css`：响应式界面、田园配色与减少动态效果支持。
-- `public/`：随项目提供的插画素材。
+- `public/village.png`：首页和分享卡使用的小镇插画。
+- `public/scenes/`：10 道题各自独立的 WebP 场景插画；题目与图片的对应关系、描述与章节标题在 `src/main.js` 的 `questionScenes` 中维护。答题时会提前加载下一题图片。
 
 本测试是娱乐性的自我探索，不是经过心理学验证的量表，不用于诊断。
 

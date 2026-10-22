@@ -11,6 +11,18 @@ const questions = [
 ['夜晚，也有自己的声音','小屋已经近在眼前。\n哪一种声音让你想放慢脚步？',['树叶被风翻动的沙沙声','远处传来的一小段琴声','屋檐下细细密密的雨声','隔壁隐约的说笑与杯碟声']],
 ['今晚的最后一点时间，属于你','门已经为你打开，灯也暖暖地亮着。\n睡前，你想先……',['泡一杯热饮，看一会儿窗外','写下今天遇到的一件小事','把带回来的小物摆在床头','翻几页床边那本没读过的书']]
 ];
+const questionScenes = [
+  {file:'01-supper', title:'热气与灯火', alt:'乡间小店的木桌上，热食与烛光静静等待来客'},
+  {file:'02-corner', title:'一个小角落', alt:'窗边、书架与暖灯围成小店里舒适的角落'},
+  {file:'03-keepsakes', title:'口袋里的礼物', alt:'木桌上摆着浅色石子、手绘地图、铜铃与口袋本'},
+  {file:'04-postcards', title:'风的来信', alt:'微风将明信片吹过蔷薇环绕的小屋门廊'},
+  {file:'05-garden', title:'花园的邀请', alt:'敞开的蔷薇木门后，是摆着茶具和花盆的乡间花园'},
+  {file:'06-bookshop', title:'书页之间', alt:'即将打烊的乡间书店里，书架与窗台植物映着暖灯'},
+  {file:'07-gift', title:'偶然的礼物', alt:'花园长椅上放着一份系着亚麻丝带的神秘纸包'},
+  {file:'08-paths', title:'暮色中的路', alt:'暮色中的乡间小路通向苹果园、小溪与亮灯的小镇'},
+  {file:'09-night', title:'听见夜晚', alt:'细雨与树叶环绕着夜幕中亮着暖灯的小屋'},
+  {file:'10-rest', title:'为自己停留', alt:'月光照进小屋卧室，床边的灯、热茶和书本等待着你'}
+];
 const homes = [
 {name:'雨声阁楼',en:'THE RAINY ATTIC',line:'你可以慢慢来，雨会替你守住这一刻。',text:'你会留意一句话里的停顿，也珍惜不必急着回应的时刻。安静能让你听见自己的节奏，细腻也让许多日常有了光。',wish:'今晚，可以先把别人的心事放在门外。这张椅子，只留给你。',color:'#758d91'},
 {name:'面包花园',en:'THE BREAD GARDEN',line:'平凡的日子里，也有刚刚好的甜。',text:'你与生活的联系，常藏在可以触摸的小事里。一份热食、一盆新叶、一张整理好的桌子，都可能让你重新安定下来。你有把日子慢慢过暖的力量。',wish:'今晚，不必照顾好所有事情。也给自己留一块最松软的面包。',color:'#ad906c'},
@@ -24,10 +36,20 @@ const weights=[[[3,1],[1,5],[0,4],[5,2]],[[0,2],[3,1],[4,0],[1,3]],[[0,5],[2,4],
 let step=-1, answers=Array(10).fill(null), result=null;
 const app=document.querySelector('#app');
 const icons=['✧','❋','☾','❦'];
+const preloadedScenes = new Set();
+function preloadNextScene(){
+  if(step < 0 || step >= questionScenes.length - 1) return;
+  const src = `/scenes/${questionScenes[step + 1].file}.webp`;
+  if(preloadedScenes.has(src)) return;
+  preloadedScenes.add(src);
+  const image = new Image();
+  image.fetchPriority = 'low';
+  image.src = src;
+}
 function header(){return `<header><a class="brand" href="#" aria-label="返回首页">✧ <span>暮光小镇</span></a><span class="header-note">给心灵的一次短暂旅行</span><button class="about" aria-label="关于这个测试">?</button></header>`}
-function render(){app.innerHTML=header()+(step===-1?landing():step<10?quiz():resultPage());document.querySelector('.brand').onclick=e=>{e.preventDefault();step=-1;render()};document.querySelector('.about').onclick=()=>{const d=document.createElement('dialog');d.innerHTML='<button class="close" aria-label="关闭">×</button><span class="eyebrow">A LITTLE NOTE</span><h2>只是一次温柔的探索</h2><p>这是原创的趣味测试，不是心理诊断，也不定义你的性格。结果只是一份关于此刻偏好的小小想象。答案仅保留在当前页面，刷新即可清除。</p><p>愿你选得自在，也愿每个结果都能给你一点温暖。</p>';app.append(d);d.querySelector('button').onclick=()=>d.close();d.showModal()};bind()}
+function render(){app.innerHTML=header()+(step===-1?landing():step<10?quiz():resultPage());document.querySelector('.brand').onclick=e=>{e.preventDefault();step=-1;render()};document.querySelector('.about').onclick=()=>{const d=document.createElement('dialog');d.innerHTML='<button class="close" aria-label="关闭">×</button><span class="eyebrow">A LITTLE NOTE</span><h2>只是一次温柔的探索</h2><p>这是原创的趣味测试，不是心理诊断，也不定义你的性格。结果只是一份关于此刻偏好的小小想象。答案仅保留在当前页面，刷新即可清除。</p><p>愿你选得自在，也愿每个结果都能给你一点温暖。</p>';app.append(d);d.querySelector('button').onclick=()=>d.close();d.showModal()};bind();preloadNextScene()}
 function landing(){return `<main class="landing"><div class="hero-copy"><span class="eyebrow"><i></i> A LITTLE JOURNEY TO YOURSELF</span><h1>今晚，有一盏灯<br>为<span>你</span>而亮。</h1><p class="intro">穿过晚风与花园，走进暮色里的小镇。<br>跟随直觉，找到那间愿意为你留灯的小屋。</p><button class="primary" id="begin">寻找我的小屋 <span>⟶</span></button><div class="journey-meta"><span>✧ 10 次随心选择</span><b>·</b><span>约 3 分钟的温柔时光</span></div></div><div class="scene-label"><span>THE TWILIGHT VILLAGE</span><p>不必成为谁，带着自己来就好。</p></div><div class="float-note"><span>☾</span> 天快黑了，进来坐坐吧。</div></main><footer><span>一段小小的旅程 · 六间温暖的小屋</span><span>趣味探索，无关对错</span></footer>`}
-function quiz(){const q=questions[step];return `<main class="quiz"><div class="quiz-top"><button class="back" id="back">← ${step?'上一站':'回到小镇'}</button><span>旅途 · ${String(step+1).padStart(2,'0')} / 10</span></div><div class="progress"><i style="width:${(step+1)*10}%"></i></div><div class="question-layout"><div class="story-art"><div class="art-caption">CHAPTER ${String(step+1).padStart(2,'0')}<p>${['热气与灯火','一个小角落','口袋里的礼物','风的来信','花园的邀请','书页之间','偶然的礼物','暮色中的路','听见夜晚','为自己停留'][step]}</p></div></div><section class="question"><span class="eyebrow">FOLLOW YOUR HEART</span><h2>${q[0]}</h2><p class="question-desc">${q[1].replace('\n','<br>')}</p><div class="options">${q[2].map((v,i)=>`<button class="option ${answers[step]===i?'selected':''}" data-answer="${i}" aria-pressed="${answers[step]===i}"><span>${icons[i]}</span>${v}<b>${answers[step]===i?'✓':'＋'}</b></button>`).join('')}</div><div class="question-bottom"><span>没有标准答案，凭直觉就好。</span><button id="next" class="primary" ${answers[step]===null?'disabled':''}>${step===9?'看看我的小屋':'继续走走'} <span>⟶</span></button></div></section></div></main>`}
+function quiz(){const q=questions[step];const scene=questionScenes[step];return `<main class="quiz"><div class="quiz-top"><button class="back" id="back">← ${step?'上一站':'回到小镇'}</button><span>旅途 · ${String(step+1).padStart(2,'0')} / 10</span></div><div class="progress"><i style="width:${(step+1)*10}%"></i></div><div class="question-layout"><div class="story-art"><img class="chapter-image" src="/scenes/${scene.file}.webp" alt="${scene.alt}" decoding="async"><div class="art-caption">CHAPTER ${String(step+1).padStart(2,'0')}<p>${scene.title}</p></div></div><section class="question"><span class="eyebrow">FOLLOW YOUR HEART</span><h2>${q[0]}</h2><p class="question-desc">${q[1].replace('\n','<br>')}</p><div class="options">${q[2].map((v,i)=>`<button class="option ${answers[step]===i?'selected':''}" data-answer="${i}" aria-pressed="${answers[step]===i}"><span>${icons[i]}</span>${v}<b>${answers[step]===i?'✓':'＋'}</b></button>`).join('')}</div><div class="question-bottom"><span>没有标准答案，凭直觉就好。</span><button id="next" class="primary" ${answers[step]===null?'disabled':''}>${step===9?'看看我的小屋':'继续走走'} <span>⟶</span></button></div></section></div></main>`}
 function compute(){const scores=Array(6).fill(0);answers.forEach((v,i)=>{const w=weights[i][v];scores[w[0]]+=2;scores[w[1]]+=1});return homes[scores.indexOf(Math.max(...scores))]}
 function resultPage(){const r=result;return `<main class="result"><span class="eyebrow">A PLACE THAT FEELS LIKE YOU</span><p class="result-kicker">今晚，为你留灯的是</p><h1>${r.name}</h1><p class="result-line">${r.line}</p><div class="result-card" style="--accent:${r.color}"><div class="result-art"><span>✧ ${r.en} ✧</span></div><div class="letter"><span class="eyebrow">DEAR YOU,</span><p>${r.text}</p><p>${r.wish}</p><span class="signature">愿你今夜好眠。<br>—— 暮光小镇</span></div></div><div class="result-actions"><button class="primary" id="save">保存我的小屋卡片 ↓</button><button class="text-button" id="restart">再走一次小镇 ↺</button></div><p class="result-disclaimer">这是一份关于此刻的温柔想象，不是对你的定义。</p><p id="save-status" role="status"></p></main>`}
 function bind(){document.querySelector('#begin')?.addEventListener('click',()=>{step=0;render()});document.querySelector('#back')?.addEventListener('click',()=>{step--;render()});document.querySelectorAll('[data-answer]').forEach(b=>b.onclick=()=>{answers[step]=Number(b.dataset.answer);render()});document.querySelector('#next')?.addEventListener('click',()=>{if(answers[step]===null)return;step++;if(step===10)result=compute();render();window.scrollTo({top:0,behavior:'smooth'})});document.querySelector('#restart')?.addEventListener('click',()=>{answers.fill(null);step=0;render()});document.querySelector('#save')?.addEventListener('click',saveCard)}
