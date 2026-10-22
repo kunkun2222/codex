@@ -24,3 +24,10 @@ dialog{border:1px solid #d8b9d14d;background:#30293e;max-width:460px;width:86%;p
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 .primary:disabled{cursor:wait;opacity:.65;transform:none}
+/* Narrative choices can span two lines without shrinking their text. */
+.option>.option-text{font-family:var(--font);font-size:inherit;width:auto;flex:1;min-width:0;color:inherit}
+.letter h3{font-size:20px;font-weight:500;color:#76546f;margin:25px 0 8px}.letter h3:first-of-type{margin-top:16px}.letter h3+p{margin-top:0}
+.choice-echo{border-top:1px solid #af8da333;padding-top:16px;margin-top:22px;font-size:15px}.choice-echo summary{cursor:pointer;color:#825f7a}.choice-echo p{line-height:1.8}.result-nuance{color:#91718b;font-size:14px;line-height:1.8}
+@media(max-width:760px){.option{min-height:54px;padding-top:10px;padding-bottom:10px}.story-art{flex-basis:100px;min-height:100px}.art-caption p{font-size:17px}.question-desc{font-size:14px;line-height:1.5}.question h2{font-size:22px}.letter{font-size:17px}}
+@media(max-width:760px) and (max-height:740px){.option{min-height:48px;padding-top:9px;padding-bottom:9px;font-size:17px}.story-art{flex-basis:64px;min-height:64px}.question h2{font-size:20px}}
+@media(max-width:760px) and (max-height:610px){.option{min-height:43px;font-size:17px;padding-top:7px;padding-bottom:7px}.story-art{flex-basis:48px;min-height:48px}.question h2{font-size:18px}.question-desc{font-size:13px}.question-bottom>span{font-size:10px}}
