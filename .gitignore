@@ -71,3 +71,8 @@ Testing/
 node_modules/
 dist/
 .vite/
+
+# Local skills and mini-tool release output
+.codex/minitool-zip-builder/
+dist-minitool/
+artifacts/

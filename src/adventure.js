@@ -1,6 +1,13 @@
+// Local ES2017 helper; no global runtime polyfill is needed.
+function objectFromEntries(entries){
+ const object={};
+ for(const [key,value] of entries)object[key]=value;
+ return object;
+}
 // An original reflective story, not a validated psychological inventory.
 // O: exploration, A: autonomy, C: connection, K: practical care,
 // R: reflection, S: structure. Multiple choices contribute to every dimension.
+const DIMENSION_KEYS=['O','A','C','K','R','S'];
 export const DIMENSIONS={
  O:{name:'探索',text:'你愿意给未知留一点位置，新的可能常能让你重新投入。'},
  A:{name:'自主',text:'你重视自己作决定的空间，也愿意听见内心真实的意愿。'},
@@ -78,7 +85,7 @@ export function buildRoute(answers){
 }
 export function pruneAnswers(answers){
  const reachable=new Set(buildRoute(answers).map(q=>q.id));
- return Object.fromEntries(Object.entries(answers).filter(([id])=>reachable.has(id)));
+ return objectFromEntries(Object.entries(answers).filter(([id])=>reachable.has(id)));
 }
 
 const originalHomes=[
@@ -111,16 +118,16 @@ export function analyze(answers){
  const route=buildRoute(answers);
  if(route.length!==TOTAL_STEPS||route.some(q=>!Number.isInteger(answers[q.id])||!q.options[answers[q.id]])) throw new Error('Complete the active route before analyzing');
  const raw={},maximum={},groups={};
- for(const key of Object.keys(DIMENSIONS)){raw[key]=0;maximum[key]=0;groups[key]=new Set()}
+ for(const key of DIMENSION_KEYS){raw[key]=0;maximum[key]=0;groups[key]=new Set()}
  for(const q of route){
   const chosen=q.options[answers[q.id]];
-  for(const key of Object.keys(DIMENSIONS)){
+  for(const key of DIMENSION_KEYS){
    raw[key]+=chosen.weights[key]||0;
    maximum[key]+=Math.max(...q.options.map(o=>o.weights[key]||0));
    if(chosen.weights[key])groups[key].add(q.id.split('-')[0]);
   }
  }
- const scores=Object.fromEntries(Object.keys(DIMENSIONS).map(key=>[key,raw[key]/(maximum[key]||1)]));
+ const scores=objectFromEntries(DIMENSION_KEYS.map(key=>[key,raw[key]/(maximum[key]||1)]));
  // Route-specific denominators stop a branch from receiving more weight merely
  // because its options contain more opportunities to express a dimension.
  const ranked=HOMES.map((home,index)=>({index,score:3*scores[home.pair[0]]+2*scores[home.pair[1]]})).sort((a,b)=>b.score-a.score||a.index-b.index);
@@ -128,10 +135,10 @@ export function analyze(answers){
  const [first,second]=home.pair;
  const supported=groups[first].size>=3&&groups[second].size>=3;
  const close=ranked[0].score-ranked[1].score<0.06;
- const evidence=route.map(q=>({q,choice:q.options[answers[q.id]]})).sort((a,b)=>((b.choice.weights[first]||0)+(b.choice.weights[second]||0))-((a.choice.weights[first]||0)+(a.choice.weights[second]||0)));
+ const evidence=route.map((q,index)=>({q,index,choice:q.options[answers[q.id]]})).sort((a,b)=>((b.choice.weights[first]||0)+(b.choice.weights[second]||0))-((a.choice.weights[first]||0)+(a.choice.weights[second]||0))||a.index-b.index);
  const distinct=[];
  for(const item of evidence){if(!distinct.some(e=>e.q.id.split('-')[0]===item.q.id.split('-')[0]))distinct.push(item);if(distinct.length===2)break}
- const third=Object.keys(scores).filter(key=>!home.pair.includes(key)&&groups[key].size>=3).sort((a,b)=>scores[b]-scores[a])[0];
+ const third=DIMENSION_KEYS.filter(key=>!home.pair.includes(key)&&groups[key].size>=3).sort((a,b)=>scores[b]-scores[a]||DIMENSION_KEYS.indexOf(a)-DIMENSION_KEYS.indexOf(b))[0];
  const personalNote=third?`另一条反复出现的线索是「${DIMENSIONS[third].name}」：${DIMENSIONS[third].text}`:'这次旅程也保留了一些尚未定形的部分，不必急着为它们命名。';
  const restNotes=[
   '你为今晚选择了暂时不用回应的独处。可以让这段安静有个温柔的边界，而不是把所有事情都留给自己消化。',

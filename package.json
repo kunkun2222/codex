@@ -7,7 +7,8 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "build:minitool": "node scripts/build-minitool.mjs"
   },
   "devDependencies": {
     "@fontsource/lxgw-wenkai": "^5.3.0",

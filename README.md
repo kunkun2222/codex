@@ -37,3 +37,14 @@ npm run build
 `npm test` 检查所有 64 种路线、无效/不完整答案、废弃分支清除、真实选项引用、12 种结果可达性、同结果不同侧写和确定性。以上是程序逻辑测试，不等同于心理测量学验证。
 
 使用 Chromium 在 320×568、375×667、390×690、390×844 与桌面 1440×1000 运行覆盖全部 24 个节点的四组路线；检查选项一屏可见、图片加载、结果与选择回声、返回改选、重测及 PNG 下载。结果页内容较长，允许正常滚动。文字放大或极小横屏也允许滚动，保留可读性。真实手机上的浏览器与保存图片体验仍需实际确认。
+
+## 小红书离线小工具包
+
+```bash
+npm run build:minitool
+python3 scripts/validate-minitool.py
+```
+
+打包需要已有 Node.js 依赖、Python 3.9+ 和 ImageMagick `magick`。输出为 `artifacts/twilight-village-minitool.zip`，静态目录为 `dist-minitool/`。单独构建为 ES2017 / Chrome 61 目标的经典 IIFE 脚本；图片在副本中缩放压缩，不改变网站原图。仅小工具构建替换图片交付模块：通过 `writeTempFile` / `saveImageToPhotosAlbum` 保存相册，不携带网站下载逻辑。原网站仍使用 PNG 下载。
+
+使用的打包 skill 为工作区 `.codex/minitool-zip-builder/` 的 1.8.0 版本。本次在线文档返回 HTTP 403，因此只依据随包规范保守适配，未完成在线 API 契约核验。普通浏览器诊断和模拟 bridge 测试不代表小工具验收；仍需在创服平台模拟器、Android 真机与 iOS 真机验证同一 ZIP。发布包与报告保存到 `releases/`，方便从 GitHub 取得。

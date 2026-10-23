@@ -1,0 +1,13 @@
+{
+  "zip": "twilight-village-minitool.zip",
+  "size": 2089618,
+  "sha256": "2d5e692c3b0622f2b4fb44192dad41b259620ead1e4bbdc863accc9da0a126a2",
+  "target": [
+    "es2017",
+    "chrome61"
+  ],
+  "onlineDocumentation": "unverified: HTTP 403; bundled 1.8.0 skill baseline used",
+  "platformSimulator": "pending user validation",
+  "androidDevice": "pending user validation",
+  "iosDevice": "pending user validation"
+}
