@@ -40,3 +40,18 @@ function notes(){openPanel('备忘录');const ul=document.createElement('ul');ul
 function closePanel(){$('panel').close()}
 function home(){closePanel();$('gameScreen').hidden=true;$('startScreen').hidden=false;$('startLabel').textContent=state.started?'继续游戏':'开始游戏';$('startGame').focus()}
 $('startGame').onclick=()=>{state.started=true;$('startScreen').hidden=true;$('gameScreen').hidden=false;render();$('phoneButton').focus()};$('home').onclick=home;$('phoneButton').onclick=phone;$('inventoryButton').onclick=inventory;$('notesButton').onclick=notes;$('closePanel').onclick=closePanel;$('hintToggle').onclick=()=>{const hidden=$('stage').classList.toggle('hide-hints');$('hintToggle').textContent='标记：'+(hidden?'关':'开');$('hintToggle').setAttribute('aria-pressed',String(!hidden))};
+
+// 背景加载完成后，留出一秒纯场景，再淡入开始界面。
+async function revealStartScreen(){
+ const background=new Image();
+ background.src='assets/house-exterior-v5.png';
+ try{await background.decode()}catch{/* 图片无法加载时仍允许进入游戏。 */}
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{
+  $('startScreen').dataset.backgroundReady='true';
+  setTimeout(()=>{
+   $('startScreen').classList.add('intro-visible');
+   $('startScreen').inert=false;
+  },1000);
+ }));
+}
+revealStartScreen();
