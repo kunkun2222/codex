@@ -2,19 +2,19 @@
 const $=id=>document.getElementById(id);
 const state={room:'yard',picked:false,read:false,notes:['回乡第一天：检查房子，准备长住和装修。'],started:false};
 const scenes={
- yard:{title:'终于，到家了。',label:'老宅前院',text:'离开科技公司的第三天，你带着行李回到了老宅。\n三十岁了，你想把这里重新装修，好好生活。\n屋里很安静。手机轻轻振了一下。'},
- garden:{title:'南瓜去哪儿了？',label:'屋旁菜园',text:'秋风拨动枯黄的藤叶。你找了找，一个成熟的南瓜也没有。\n墙根下，几截瓜柄露着浅色的断口。'},
- living:{title:'你在沙发上坐下。',label:'一楼客厅',text:'灯亮着，电视里的风景缓缓变换。\n左边的卧室门紧锁，右侧的厨房门关闭。右前方，是通往二楼的楼梯。'},
- entrance:{title:'大门就在身后。',label:'一楼大门口',text:'你转过身，面对关着的入户门。\n行李还放在鞋架旁。电视的声音从身后传来。'},
- dark:{title:'灯，灭了。',label:'一楼客厅',text:'啪。整栋房子突然陷入黑暗。\n总闸在屋外。你摸出手机，微光照亮了门把手。\n门外，传来一声很轻的鞋底摩擦声。'}
+ yard:{label:'老宅前院'},
+ garden:{label:'屋旁菜园'},
+ living:{label:'一楼客厅'},
+ entrance:{label:'一楼大门口'},
+ dark:{label:'一楼大门口'}
 };
 function addNote(text){if(!state.notes.includes(text))state.notes.push(text)}
 function feedback(text){$('feedback').textContent=text}
 function action(label,fn){const b=document.createElement('button');b.textContent=label;b.onclick=fn;$('actions').append(b)}
-function spot(label,x,y,fn,width=10,height=12){const b=document.createElement('button');b.className='hotspot';b.textContent=label;b.setAttribute('aria-label',label);b.style.left=x+'%';b.style.top=y+'%';b.style.width=width+'%';b.style.height=height+'%';b.onclick=fn;$('hotspots').append(b)}
-function render(room=state.room){state.room=room;const data=scenes[room];$('sceneLabel').textContent=data.label;$('clock').textContent=room==='dark'?'22:17':'18:40';$('chapter').textContent='第一章 / 回乡';$('title').textContent=data.title;$('description').textContent=data.text;$('feedback').textContent='';$('hotspots').replaceChildren();$('actions').replaceChildren();$('backdrop').className='backdrop'+(['living','dark'].includes(room)?' interior':'')+(room==='dark'?' dark':'')+(room==='garden'?' garden':'');$('artNotice').hidden=true;$('stage').dataset.room=room;$('turnBack').hidden=!['living','entrance'].includes(room);$('turnBack').setAttribute('aria-label',room==='entrance'?'转身回到客厅':'向后转身，回到大门口');$('turnBack').querySelector('span').textContent=room==='entrance'?'客厅':'大门口';$('backdrop').classList.toggle('entrance',room==='entrance'||room==='dark');
+function spot(label,x,y,fn,width=10,height=12){const b=document.createElement('button');b.className='hotspot';b.setAttribute('aria-label',label);b.style.left=x+'%';b.style.top=y+'%';b.style.width=width+'%';b.style.height=height+'%';b.onclick=fn;$('hotspots').append(b)}
+function render(room=state.room){state.room=room;const data=scenes[room];$('sceneLabel').textContent=data.label;$('clock').textContent=room==='dark'?'22:17':'18:40';$('feedback').textContent='';$('hotspots').replaceChildren();$('actions').replaceChildren();$('backdrop').className='backdrop'+(['living','dark'].includes(room)?' interior':'')+(room==='dark'?' dark':'')+(room==='garden'?' garden':'');$('artNotice').hidden=true;$('stage').dataset.room=room;$('turnBack').hidden=!['living','entrance'].includes(room);$('turnBack').setAttribute('aria-label',room==='entrance'?'转身回到客厅':'向后转身，回到大门口');$('turnBack').querySelector('span').textContent=room==='entrance'?'客厅':'大门口';$('backdrop').classList.toggle('entrance',room==='entrance'||room==='dark');
  if(room==='yard'){
- spot('进入老宅',38,55,()=>render('living'));
+ spot('进入老宅',37,61,()=>render('living'),18,38);
  spot('电闸',61,52,()=>feedback('总闸挂在右侧外墙上。记住它的位置，也许会用得到。'));
  spot('查看菜园',81,64,()=>render('garden'));
  action(state.read?'打开手机':'查看新短信',phone);
