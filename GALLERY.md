@@ -2,11 +2,11 @@
 
 ## 当前方向：写实恐怖夜景
 
-保留两层贴砖自建房、小阁楼、右墙电闸和被采摘过的菜田，以夜色、真实旧化材质和局部手电照明表现危险。
+保留两层贴砖自建房、小阁楼、右墙电闸和无果实的枯藤土垄，以夜色、真实旧化材质和局部手电照明表现危险。
 
-![第四版：写实恐怖夜景](game/assets/house-exterior-v4.png)
+![第五版：写实恐怖夜景](game/assets/house-exterior-v5.png)
 
-[查看或下载原图](game/assets/house-exterior-v4.png)
+[查看或下载原图](game/assets/house-exterior-v5.png)
 
 ## 第三版：萧条秋日
 
