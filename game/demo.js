@@ -4,15 +4,15 @@ const state={room:'yard',picked:false,read:false,notes:['回乡第一天：检�
 const scenes={
  yard:{title:'终于，到家了。',label:'老宅前院',text:'离开科技公司的第三天，你带着行李回到了老宅。\n三十岁了，你想把这里重新装修，好好生活。\n屋里很安静。手机轻轻振了一下。'},
  garden:{title:'南瓜去哪儿了？',label:'屋旁菜园',text:'秋风拨动枯黄的藤叶。你找了找，一个成熟的南瓜也没有。\n墙根下，几截瓜柄露着浅色的断口。'},
- living:{title:'你在沙发上坐下。',label:'一楼客厅',text:'灯亮着，电视里的风景缓缓变换。\n左边的卧室门紧锁，右边的厨房门半开着。右前方，是通往二楼的楼梯。'},
+ living:{title:'你在沙发上坐下。',label:'一楼客厅',text:'灯亮着，电视里的风景缓缓变换。\n左边的卧室门紧锁，右侧的厨房门关闭。右前方，是通往二楼的楼梯。'},
  entrance:{title:'大门就在身后。',label:'一楼大门口',text:'你转过身，面对关着的入户门。\n行李还放在鞋架旁。电视的声音从身后传来。'},
  dark:{title:'灯，灭了。',label:'一楼客厅',text:'啪。整栋房子突然陷入黑暗。\n总闸在屋外。你摸出手机，微光照亮了门把手。\n门外，传来一声很轻的鞋底摩擦声。'}
 };
 function addNote(text){if(!state.notes.includes(text))state.notes.push(text)}
 function feedback(text){$('feedback').textContent=text}
 function action(label,fn){const b=document.createElement('button');b.textContent=label;b.onclick=fn;$('actions').append(b)}
-function spot(label,x,y,fn){const b=document.createElement('button');b.className='hotspot';b.textContent=label;b.setAttribute('aria-label',label);b.style.left=x+'%';b.style.top=y+'%';b.onclick=fn;$('hotspots').append(b)}
-function render(room=state.room){state.room=room;const data=scenes[room];$('sceneLabel').textContent=data.label;$('clock').textContent=room==='dark'?'22:17':'18:40';$('chapter').textContent='第一章 / 回乡';$('title').textContent=data.title;$('description').textContent=data.text;$('feedback').textContent='';$('hotspots').replaceChildren();$('actions').replaceChildren();$('backdrop').className='backdrop'+(['living','dark'].includes(room)?' interior':'')+(room==='dark'?' dark':'')+(room==='garden'?' garden':'');$('artNotice').hidden=true;$('stage').dataset.room=room;$('turnBack').hidden=room!=='living';$('backdrop').classList.toggle('entrance',room==='entrance'||room==='dark');
+function spot(label,x,y,fn,width=10,height=12){const b=document.createElement('button');b.className='hotspot';b.textContent=label;b.setAttribute('aria-label',label);b.style.left=x+'%';b.style.top=y+'%';b.style.width=width+'%';b.style.height=height+'%';b.onclick=fn;$('hotspots').append(b)}
+function render(room=state.room){state.room=room;const data=scenes[room];$('sceneLabel').textContent=data.label;$('clock').textContent=room==='dark'?'22:17':'18:40';$('chapter').textContent='第一章 / 回乡';$('title').textContent=data.title;$('description').textContent=data.text;$('feedback').textContent='';$('hotspots').replaceChildren();$('actions').replaceChildren();$('backdrop').className='backdrop'+(['living','dark'].includes(room)?' interior':'')+(room==='dark'?' dark':'')+(room==='garden'?' garden':'');$('artNotice').hidden=true;$('stage').dataset.room=room;$('turnBack').hidden=!['living','entrance'].includes(room);$('turnBack').setAttribute('aria-label',room==='entrance'?'转身回到客厅':'向后转身，回到大门口');$('turnBack').querySelector('span').textContent=room==='entrance'?'客厅':'大门口';$('backdrop').classList.toggle('entrance',room==='entrance'||room==='dark');
  if(room==='yard'){
  spot('进入老宅',38,55,()=>render('living'));
  spot('电闸',61,52,()=>feedback('总闸挂在右侧外墙上。记住它的位置，也许会用得到。'));
@@ -24,16 +24,14 @@ function render(room=state.room){state.room=room;const data=scenes[room];$('scen
  action('回到前院',()=>render('yard'));
  }
  if(room==='living'){
- spot('爷爷奶奶的卧室',11,47,()=>{feedback('你轻轻转动把手。门紧锁着，里面没有回应。');addNote('一楼爷爷奶奶的卧室门紧锁。')});
- spot('电视',44,49,()=>feedback('电视里正在播放山水风光。熟悉的解说声让屋里不至于太安静。'));
- spot('厨房门',69,46,()=>feedback('厨房门半开着，里面亮着灯。空气里有一丝甜味。'));
- spot(state.picked?'查看手电筒':'拿起手电筒',76,82,()=>{if(!state.picked){state.picked=true;addNote('已拿到手电筒。');$('capacity').textContent='1/4'}feedback('茶几上的手电筒还能用。你把它收进工具箱。')});
- spot('上楼休息',90,43,()=>{addNote('准备上楼时突然停电。总闸在屋外。');render('dark')});
+ spot('爷爷奶奶的卧室',11,48,()=>{feedback('你轻轻转动把手。门紧锁着，里面没有回应。');addNote('一楼爷爷奶奶的卧室门紧锁。')},14,60);
+ spot('电视',45,51,()=>feedback('电视里正在播放山水风光。'),18,20);
+ spot('厨房门',92,48,()=>feedback('厨房门关着。你贴近听了听，里面没有动静。'),14,65);
+ spot(state.picked?'查看手电筒':'拿起手电筒',72,86,()=>{if(!state.picked){state.picked=true;addNote('已拿到手电筒。');$('capacity').textContent='1/4'}render('living');feedback('茶几上的手电筒还能用。你把它收进工具箱。')},15,12);
+ spot('上楼休息',75,48,()=>{addNote('准备上楼时突然停电。总闸在屋外。');render('dark')},15,48);
  }
  if(room==='entrance'){
- spot('查看门锁',50,50,()=>feedback('门锁完好。你又确认了一遍，已经锁好了。'));
- action('打开门，回到院子',()=>render('yard'));
- action('转回客厅',()=>render('living'));
+ spot('查看门锁',50,48,()=>{feedback('门锁完好，已经锁好了。');$('actions').replaceChildren();action('打开门，回到院子',()=>render('yard'))},28,56);
  }
  if(room==='dark'){
  spot('门把手',50,50,()=>{feedback('手指刚碰上去，把手就在另一侧轻轻向下压了一点。你缩回了手。');addNote('有人正在外面试探门把手。');finish()});
@@ -117,4 +115,4 @@ $('advancePrologue').onclick=async()=>{
  }
 };
 
-$('turnBack').onclick=()=>render('entrance');
+$('turnBack').onclick=()=>render(state.room==='entrance'?'living':'entrance');

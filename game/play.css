@@ -23,9 +23,17 @@
 @media(prefers-reduced-motion:reduce){.prologue-content,.prologue-hint{transition:none}.scene-arrival{animation:none}}
 
 /* 客厅采用独立完整图，向后箭头切换入户门视角。 */
-.backdrop.interior{background-image:url('assets/living-room-v1.png');background-size:100% 100%;background-position:center}
-.backdrop.entrance{background-image:url('assets/entrance-v1.png');background-size:100% 100%;background-position:center}
+.backdrop.interior{background-image:url('assets/living-room-v2.png');background-size:100% 100%;background-position:center}
+.backdrop.entrance{background-image:url('assets/entrance-v2.png');background-size:100% 100%;background-position:center}
 .turn-back{position:absolute;left:5%;bottom:5%;z-index:3;display:flex;flex-direction:column;align-items:center;gap:5px;background:#0d1512bd;border:1px solid #c5b58a66;padding:10px 16px;font-size:11px;color:var(--gold);letter-spacing:2px}
 .turn-back svg{width:27px;height:27px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}.turn-back:hover{background:#3f4332}
 .stage[data-room="living"] .narration{left:22%;right:22%;bottom:4%}
 @media(max-width:600px) and (orientation:portrait){.backdrop.interior,.backdrop.entrance{background-size:100% auto;background-position:center top}.stage[data-room="living"] .narration{left:6%;right:6%;bottom:7%}.turn-back{bottom:42%;left:6%;padding:8px 12px}}
+
+/* 场景无常驻标签，物体本身就是点击区域。 */
+.hotspot,.hotspot:hover{border:0;border-radius:0;padding:0;background:transparent;box-shadow:none;color:transparent;font-size:0;letter-spacing:0;opacity:1;cursor:pointer}
+.hotspot:before{display:none}.hotspot:focus-visible{outline:1px solid #c5b58a99;outline-offset:-3px}
+.narration .chapter,.narration #title,.narration #description,.toolbar-hint,.hint-toggle{display:none}
+.narration:has(#feedback:empty):has(.actions:empty){display:none}
+.narration #feedback:not(:empty){display:inline-block;padding:10px 18px;background:#070b09c9;border:1px solid #c5b58a25;color:#d4ccba}
+.stage[data-room="living"] .vignette,.stage[data-room="entrance"] .vignette{background:linear-gradient(0deg,#0508094d,transparent 30%)}

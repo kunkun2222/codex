@@ -10,11 +10,11 @@
 
 ## 客厅：沙发上的视角
 
-![新版客厅，电视和灯开着](game/assets/living-room-v1.png)
+![新版客厅，电视和灯开着](game/assets/living-room-v2.png)
 
 ## 大门口：转身后的视角
 
-![客厅反向入户门](game/assets/entrance-v1.png)
+![客厅反向入户门](game/assets/entrance-v2.png)
 
 ## 第三版：萧条秋日
 
