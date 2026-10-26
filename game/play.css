@@ -8,3 +8,16 @@
 .start-screen .start-content,.start-screen .gallery-link,.start-screen .start-footer{opacity:0;visibility:hidden;transition:opacity 1.1s ease,visibility 0s linear 1.1s}
 .start-screen.intro-visible .start-content,.start-screen.intro-visible .gallery-link,.start-screen.intro-visible .start-footer{opacity:1;visibility:visible;transition:opacity 1.1s ease,visibility 0s}
 @media(prefers-reduced-motion:reduce){.start-screen .start-content,.start-screen .gallery-link,.start-screen .start-footer{transition:none!important}}
+
+/* 黑屏双幕序章。文字整体淡入淡出，点击空白处也能继续。 */
+.prologue{position:fixed;inset:0;z-index:10;background:#000;display:flex;align-items:center;justify-content:center;padding:48px 24px 76px;overflow:auto}
+.prologue-content{position:relative;z-index:1;pointer-events:none;width:min(620px,100%);margin:auto;opacity:0;transition:opacity .65s ease;color:#c4c2ba;font:16px/2.25 'Noto Serif CJK SC','Songti SC',Georgia,serif;letter-spacing:1px}
+.prologue-content p{margin:0 0 22px}.prologue-content p:first-child{color:#e1dcd1}.prologue-content p:last-child{margin-bottom:0}
+.advance-prologue{position:fixed;inset:0;width:100%;height:100%;border:0;border-radius:0;background:transparent;cursor:pointer;z-index:0;touch-action:manipulation}
+.advance-prologue:focus-visible{outline:1px solid #b8af8455;outline-offset:-10px}
+.prologue-hint{position:fixed;bottom:28px;left:0;right:0;text-align:center;pointer-events:none;opacity:0;transition:opacity .65s;color:#767970;font-size:10px;letter-spacing:4px}
+.prologue.text-visible .prologue-content,.prologue.text-visible .prologue-hint{opacity:1}
+.scene-arrival{animation:scene-arrival 1.2s ease both}@keyframes scene-arrival{from{opacity:0}to{opacity:1}}
+@media(max-width:600px){.prologue{padding:32px 25px 70px}.prologue-content{font-size:14px;line-height:2.1;letter-spacing:.5px}.prologue-content p{margin-bottom:18px}.prologue-hint{bottom:22px}}
+@media(max-height:520px) and (orientation:landscape){.prologue{padding:20px 40px 48px}.prologue-content{width:min(780px,100%);font-size:12px;line-height:1.8}.prologue-content p{margin-bottom:10px}.prologue-hint{bottom:12px}}
+@media(prefers-reduced-motion:reduce){.prologue-content,.prologue-hint{transition:none}.scene-arrival{animation:none}}

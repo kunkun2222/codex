@@ -39,7 +39,7 @@ function inventory(){openPanel('工具箱 · '+(state.picked?'1':'0')+' / 4');co
 function notes(){openPanel('备忘录');const ul=document.createElement('ul');ul.className='notes';for(const text of state.notes){const li=document.createElement('li');li.textContent=text;ul.append(li)}$('panelBody').append(ul)}
 function closePanel(){$('panel').close()}
 function home(){closePanel();$('gameScreen').hidden=true;$('startScreen').hidden=false;$('startLabel').textContent=state.started?'继续游戏':'开始游戏';$('startGame').focus()}
-$('startGame').onclick=()=>{state.started=true;$('startScreen').hidden=true;$('gameScreen').hidden=false;render();$('phoneButton').focus()};$('home').onclick=home;$('phoneButton').onclick=phone;$('inventoryButton').onclick=inventory;$('notesButton').onclick=notes;$('closePanel').onclick=closePanel;$('hintToggle').onclick=()=>{const hidden=$('stage').classList.toggle('hide-hints');$('hintToggle').textContent='标记：'+(hidden?'关':'开');$('hintToggle').setAttribute('aria-pressed',String(!hidden))};
+$('startGame').onclick=()=>{if(state.started){enterGame()}else{beginPrologue()}};$('home').onclick=home;$('phoneButton').onclick=phone;$('inventoryButton').onclick=inventory;$('notesButton').onclick=notes;$('closePanel').onclick=closePanel;$('hintToggle').onclick=()=>{const hidden=$('stage').classList.toggle('hide-hints');$('hintToggle').textContent='标记：'+(hidden?'关':'开');$('hintToggle').setAttribute('aria-pressed',String(!hidden))};
 
 // 背景加载完成后，留出一秒纯场景，再淡入开始界面。
 async function revealStartScreen(){
@@ -55,3 +55,56 @@ async function revealStartScreen(){
  }));
 }
 revealStartScreen();
+
+const prologuePages=[
+ [
+  '三十岁这年，你辞掉了科技公司的工作。',
+  '这些年，你攒下了一笔钱，也习惯了深夜的消息、没完没了的会议，以及醒来就要查看手机的生活。离职后的第一个早晨，你睡到自然醒，却不知道该去哪里。',
+  '你想起了乡下的老宅。',
+  '一年前，爷爷奶奶搬进城里，把钥匙留给了你。你总说有空就回去看看，却一次次被工作耽搁。那把钥匙压在抽屉深处，直到收拾东西时，才重新翻了出来。'
+ ],
+ [
+  '你决定搬回去住。',
+  '房子需要重新装修，院子也该收拾了。不过这些都可以慢慢来。你想种点菜，学着做饭，过几天不用赶时间的日子。',
+  '车子驶进村子，路两旁渐渐没了人家。你记得这段路，小时候放学，总觉得怎么走都走不到头。',
+  '老宅就在最里面，和记忆中差不多。',
+  '你下车，拖着行李走到门前，找出了那把旧钥匙。',
+  '终于到家了。'
+ ]
+];
+let prologuePage=0,prologueBusy=false;
+const transitionTime=()=>matchMedia('(prefers-reduced-motion: reduce)').matches?0:650;
+const waitFor=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+function fillPrologue(){
+ $('prologueText').replaceChildren();
+ for(const text of prologuePages[prologuePage]){const p=document.createElement('p');p.textContent=text;$('prologueText').append(p)}
+ $('prologue').dataset.page=String(prologuePage+1);
+ $('advancePrologue').setAttribute('aria-label',prologuePage===0?'继续故事':'进入老宅');
+}
+function enterGame(){
+ state.started=true;$('startScreen').hidden=true;$('prologue').hidden=true;$('gameScreen').hidden=false;
+ render();$('phoneButton').focus();
+}
+async function beginPrologue(){
+ prologuePage=0;prologueBusy=true;$('advancePrologue').disabled=true;
+ $('startScreen').hidden=true;$('prologue').hidden=false;$('prologue').classList.remove('text-visible');
+ fillPrologue();
+ await waitFor(100);
+ $('prologue').classList.add('text-visible');
+ await waitFor(transitionTime());
+ prologueBusy=false;$('advancePrologue').disabled=false;$('advancePrologue').focus({preventScroll:true});
+}
+$('advancePrologue').onclick=async()=>{
+ if(prologueBusy)return;
+ prologueBusy=true;$('advancePrologue').disabled=true;
+ $('prologue').classList.remove('text-visible');
+ await waitFor(transitionTime());
+ if(prologuePage===0){
+  prologuePage=1;fillPrologue();await waitFor(100);
+  $('prologue').classList.add('text-visible');await waitFor(transitionTime());
+  prologueBusy=false;$('advancePrologue').disabled=false;$('advancePrologue').focus({preventScroll:true});
+ }else{
+  enterGame();
+  $('gameScreen').classList.add('scene-arrival');
+ }
+};

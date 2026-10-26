@@ -13,6 +13,11 @@
 <div class="start-content"><h1 class="horror-title" aria-label="归宅"><span aria-hidden="true">归</span><span aria-hidden="true">宅</span></h1><button id="startGame" class="start-button"><svg class="start-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M7 28V4h16v24M7 4l11 4v20l-11-3M12 16h1M4 28h23"/></svg><span id="startLabel">开始游戏</span></button></div>
 <p class="start-footer">本游戏含恐怖、惊吓及紧张情节，请酌情体验。</p>
 </section>
+<section id="prologue" class="prologue" aria-label="故事序幕" hidden>
+<div class="prologue-content" id="prologueText" aria-live="polite"></div>
+<button id="advancePrologue" class="advance-prologue" aria-label="继续故事"></button>
+<span class="prologue-hint" aria-hidden="true">点击屏幕继续</span>
+</section>
 <section id="gameScreen" class="game-screen" aria-label="游戏场景" hidden>
 <header class="hud"><button id="home" class="wordmark" aria-label="返回开始界面">归宅</button><div><span id="sceneLabel"></span><span class="separator">/</span><time id="clock"></time></div><a href="gallery.html" aria-label="查看场景画廊">画廊 ↗</a></header>
 <div class="stage-wrap"><section id="stage" class="stage" aria-label="可探索的画面"><div id="backdrop" class="backdrop"></div><div class="vignette"></div><div id="hotspots" class="hotspots"></div><span id="artNotice" class="art-notice" hidden>室内早期概念 · 待重绘</span>
