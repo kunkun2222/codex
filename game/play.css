@@ -37,3 +37,15 @@
 .narration:has(#feedback:empty):has(.actions:empty){display:none}
 .narration #feedback:not(:empty){display:inline-block;padding:10px 18px;background:#070b09c9;border:1px solid #c5b58a25;color:#d4ccba}
 .stage[data-room="living"] .vignette,.stage[data-room="entrance"] .vignette{background:linear-gradient(0deg,#0508094d,transparent 30%)}
+
+/* 可独立操作的客厅灯、楼梯灯和电视。 */
+.backdrop.interior{background-image:url('assets/living-room-v3-on.png')}
+.backdrop.interior.main-light-off{background-image:url('assets/living-room-v3-off.png')}
+.backdrop.entrance{background-image:url('assets/entrance-v2.png')}
+.backdrop.entrance-light-off{filter:brightness(.48) saturate(.75)}
+.room-effects{position:absolute;inset:0;pointer-events:none}
+.stair-lighting{position:absolute;inset:0;background:url('assets/living-room-v3-on.png') center/100% 100%;clip-path:polygon(67.4% 11%,80.5% 11%,81.5% 79%,68% 79%);filter:brightness(2.1) saturate(.65)}
+.tv-picture{position:absolute;left:36.95%;top:41.85%;width:16.15%;height:15.4%;background-size:100% 100%;background-position:center;box-shadow:0 0 18px #699db133;filter:brightness(.85);overflow:hidden}
+.tv-picture:after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 2px,#0002 2px 3px);opacity:.35}
+@media(max-width:600px) and (orientation:portrait){.room-effects{bottom:auto;width:100%;aspect-ratio:16/9}}
+.stair-lighting{clip-path:none;mask-image:radial-gradient(ellipse 8% 37% at 75% 47%,#000 40%,transparent 100%);-webkit-mask-image:radial-gradient(ellipse 8% 37% at 75% 47%,#000 40%,transparent 100%)}

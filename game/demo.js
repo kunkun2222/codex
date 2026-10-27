@@ -1,6 +1,6 @@
 'use strict';
 const $=id=>document.getElementById(id);
-const state={room:'yard',picked:false,read:false,notes:['回乡第一天：检查房子，准备长住和装修。'],started:false};
+const state={room:'yard',picked:false,read:false,notes:['回乡第一天：检查房子，准备长住和装修。'],started:false,mainLight:false,stairLight:false,tvMode:0,powerOut:false};
 const scenes={
  yard:{label:'老宅前院'},
  garden:{label:'屋旁菜园'},
@@ -11,8 +11,9 @@ const scenes={
 function addNote(text){if(!state.notes.includes(text))state.notes.push(text)}
 function feedback(text){$('feedback').textContent=text}
 function action(label,fn){const b=document.createElement('button');b.textContent=label;b.onclick=fn;$('actions').append(b)}
-function spot(label,x,y,fn,width=10,height=12){const b=document.createElement('button');b.className='hotspot';b.setAttribute('aria-label',label);b.style.left=x+'%';b.style.top=y+'%';b.style.width=width+'%';b.style.height=height+'%';b.onclick=fn;$('hotspots').append(b)}
+function spot(label,x,y,fn,width=10,height=12){const b=document.createElement('button');b.className='hotspot';b.setAttribute('aria-label',label);b.style.left=x+'%';b.style.top=y+'%';b.style.width=width+'%';b.style.height=height+'%';if(label.includes('开关'))b.style.zIndex='2';b.onclick=fn;$('hotspots').append(b)}
 function render(room=state.room){state.room=room;const data=scenes[room];$('sceneLabel').textContent=data.label;$('clock').textContent=room==='dark'?'22:17':'18:40';$('feedback').textContent='';$('hotspots').replaceChildren();$('actions').replaceChildren();$('backdrop').className='backdrop'+(['living','dark'].includes(room)?' interior':'')+(room==='dark'?' dark':'')+(room==='garden'?' garden':'');$('artNotice').hidden=true;$('stage').dataset.room=room;$('turnBack').hidden=!['living','entrance'].includes(room);$('turnBack').setAttribute('aria-label',room==='entrance'?'转身回到客厅':'向后转身，回到大门口');$('turnBack').querySelector('span').textContent=room==='entrance'?'客厅':'大门口';$('backdrop').classList.toggle('entrance',room==='entrance'||room==='dark');
+ updateRoomControls();
  if(room==='yard'){
  spot('进入老宅',37,61,()=>render('living'),18,38);
  spot('电闸',61,52,()=>feedback('总闸挂在右侧外墙上。记住它的位置，也许会用得到。'));
@@ -24,11 +25,13 @@ function render(room=state.room){state.room=room;const data=scenes[room];$('scen
  action('回到前院',()=>render('yard'));
  }
  if(room==='living'){
+ spot('客厅灯开关',2,39,toggleMainLight,5,12);
+ spot('楼梯灯开关',84.8,44,toggleStairLight,5,12);
  spot('爷爷奶奶的卧室',11,48,()=>{feedback('你轻轻转动把手。门紧锁着，里面没有回应。');addNote('一楼爷爷奶奶的卧室门紧锁。')},14,60);
- spot('电视',45,51,()=>feedback('电视里正在播放山水风光。'),18,20);
+ spot('电视',45,50,cycleTv,17,19);
  spot('厨房门',92,48,()=>feedback('厨房门关着。你贴近听了听，里面没有动静。'),14,65);
  spot(state.picked?'查看手电筒':'拿起手电筒',72,86,()=>{if(!state.picked){state.picked=true;addNote('已拿到手电筒。');$('capacity').textContent='1/4'}render('living');feedback('茶几上的手电筒还能用。你把它收进工具箱。')},15,12);
- spot('上楼休息',75,48,()=>{addNote('准备上楼时突然停电。总闸在屋外。');render('dark')},15,48);
+ spot('上楼休息',75,48,()=>{state.powerOut=true;addNote('准备上楼时突然停电。总闸在屋外。');render('dark')},15,48);
  }
  if(room==='entrance'){
  spot('查看门锁',50,48,()=>{feedback('门锁完好，已经锁好了。');$('actions').replaceChildren();action('打开门，回到院子',()=>render('yard'))},28,56);
@@ -116,3 +119,36 @@ $('advancePrologue').onclick=async()=>{
 };
 
 $('turnBack').onclick=()=>render(state.room==='entrance'?'living':'entrance');
+
+const tvModes=['关机','新闻联播','电影频道','动画片'];
+const tvImages=['','assets/tv-news.svg','assets/tv-movie.svg','assets/tv-cartoon.svg'];
+function updateRoomControls(){
+ const living=state.room==='living';
+ const powered=!state.powerOut;
+ $('backdrop').classList.toggle('main-light-off',living&&(!state.mainLight||!powered));
+ $('backdrop').classList.toggle('entrance-light-off',state.room==='entrance'&&(!state.mainLight||!powered));
+ $('roomEffects').hidden=!living;
+ $('stairLighting').hidden=!(living&&powered&&state.stairLight);
+ $('tvPicture').hidden=!(living&&powered&&state.tvMode>0);
+ $('tvPicture').style.backgroundImage=state.tvMode>0?'url("'+tvImages[state.tvMode]+'")':'none';
+ $('stage').dataset.mainLight=String(powered&&state.mainLight);
+ $('stage').dataset.stairLight=String(powered&&state.stairLight);
+ $('stage').dataset.tvMode=String(powered?state.tvMode:0);
+}
+function toggleMainLight(){
+ if(state.powerOut){feedback('你按了按开关，没有反应。整栋房子都停电了。');return}
+ state.mainLight=!state.mainLight;updateRoomControls();
+ feedback(state.mainLight?'啪嗒。客厅灯亮了。':'你关掉了客厅灯，房间又暗下来。');
+}
+function toggleStairLight(){
+ if(state.powerOut){feedback('楼梯灯没有亮，已经停电了。');return}
+ state.stairLight=!state.stairLight;updateRoomControls();
+ feedback(state.stairLight?'楼梯灯亮了，台阶清楚了一些。':'楼梯灯熄灭了。');
+}
+function cycleTv(){
+ if(state.powerOut){feedback('电视没有反应，已经停电了。');return}
+ state.tvMode=(state.tvMode+1)%tvModes.length;updateRoomControls();
+ feedback(state.tvMode===0?'你关掉了电视。':'电视切换到：'+tvModes[state.tvMode]+'。');
+}
+
+for(const src of ['assets/living-room-v3-on.png','assets/living-room-v3-off.png',...tvImages.slice(1)]){const image=new Image();image.src=src}
