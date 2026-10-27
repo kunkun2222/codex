@@ -10,7 +10,7 @@
 
 ## 客厅：沙发上的视角
 
-![新版客厅，电视和灯开着](game/assets/living-room-v2.png)
+![新版客厅，灯与电视初始关闭](game/assets/living-room-v3-off.png)
 
 ## 大门口：转身后的视角
 
