@@ -14,7 +14,13 @@
 
 ## 大门口：转身后的视角
 
-![客厅反向入户门](game/assets/entrance-v2.png)
+![客厅反向入户门](game/assets/entrance-v3-off.png)
+
+## 菜园：独立场景
+
+![菜园断梗与脚印](game/assets/garden-v1.png)
+
+正式剧情第一晚暂不开放。网页画廊提供单独的线索互动预览。
 
 ## 第三版：萧条秋日
 

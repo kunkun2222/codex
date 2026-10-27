@@ -24,7 +24,7 @@
 
 /* 客厅采用独立完整图，向后箭头切换入户门视角。 */
 .backdrop.interior{background-image:url('assets/living-room-v2.png');background-size:100% 100%;background-position:center}
-.backdrop.entrance{background-image:url('assets/entrance-v2.png');background-size:100% 100%;background-position:center}
+.backdrop.entrance{background-image:url('assets/entrance-v3-on.png');background-size:100% 100%;background-position:center}
 .turn-back{position:absolute;left:5%;bottom:5%;z-index:3;display:flex;flex-direction:column;align-items:center;gap:5px;background:#0d1512bd;border:1px solid #c5b58a66;padding:10px 16px;font-size:11px;color:var(--gold);letter-spacing:2px}
 .turn-back svg{width:27px;height:27px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}.turn-back:hover{background:#3f4332}
 .stage[data-room="living"] .narration{left:22%;right:22%;bottom:4%}
@@ -41,11 +41,16 @@
 /* 可独立操作的客厅灯、楼梯灯和电视。 */
 .backdrop.interior{background-image:url('assets/living-room-v3-on.png')}
 .backdrop.interior.main-light-off{background-image:url('assets/living-room-v3-off.png')}
-.backdrop.entrance{background-image:url('assets/entrance-v2.png')}
-.backdrop.entrance-light-off{filter:brightness(.48) saturate(.75)}
+.backdrop.entrance{background-image:url('assets/entrance-v3-on.png')}
+.backdrop.entrance-light-off{filter:none;background-image:url('assets/entrance-v3-off.png')}
 .room-effects{position:absolute;inset:0;pointer-events:none}
 .stair-lighting{position:absolute;inset:0;background:url('assets/living-room-v3-on.png') center/100% 100%;clip-path:polygon(67.4% 11%,80.5% 11%,81.5% 79%,68% 79%);filter:brightness(2.1) saturate(.65)}
 .tv-picture{position:absolute;left:36.95%;top:41.85%;width:16.15%;height:15.4%;background-size:100% 100%;background-position:center;box-shadow:0 0 18px #699db133;filter:brightness(.85);overflow:hidden}
 .tv-picture:after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 2px,#0002 2px 3px);opacity:.35}
 @media(max-width:600px) and (orientation:portrait){.room-effects{bottom:auto;width:100%;aspect-ratio:16/9}}
 .stair-lighting{clip-path:none;mask-image:radial-gradient(ellipse 8% 37% at 75% 47%,#000 40%,transparent 100%);-webkit-mask-image:radial-gradient(ellipse 8% 37% at 75% 47%,#000 40%,transparent 100%)}
+
+/* 视角切换直接显示正确灯光帧，不经过滤镜动画。 */
+.backdrop{transition:none}
+.backdrop.garden{background-image:url('assets/garden-v1.png');background-size:100% 100%;background-position:center;filter:none}
+@media(max-width:600px) and (orientation:portrait){.backdrop.garden{background-size:100% auto;background-position:center top}}
