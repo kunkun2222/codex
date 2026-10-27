@@ -56,9 +56,9 @@
 @media(max-width:600px) and (orientation:portrait){.backdrop.garden{background-size:100% auto;background-position:center top}}
 
 /* 二楼三间房、阁楼木梯与双开关。 */
-.backdrop.upstairs{background-image:url('assets/upstairs-v1-on.png');background-size:100% 100%;background-position:center;filter:none}
-.backdrop.upstairs.hall-light-off{background-image:url('assets/upstairs-v1-off.png')}
-.landing-stair-lighting{position:absolute;inset:0;background:url('assets/upstairs-v1-on.png') center/100% 100%;filter:brightness(1.25);mask-image:radial-gradient(ellipse 19% 30% at 93% 84%,#000 25%,transparent 100%);-webkit-mask-image:radial-gradient(ellipse 19% 30% at 93% 84%,#000 25%,transparent 100%)}
+.backdrop.upstairs{background-image:url('assets/upstairs-v2-on.png');background-size:100% 100%;background-position:center;filter:none}
+.backdrop.upstairs.hall-light-off{background-image:url('assets/upstairs-v2-off.png')}
+.landing-stair-lighting{position:absolute;inset:0;background:url('assets/upstairs-v2-on.png') center/100% 100%;filter:brightness(1.25);mask-image:radial-gradient(ellipse 19% 30% at 93% 84%,#000 25%,transparent 100%);-webkit-mask-image:radial-gradient(ellipse 19% 30% at 93% 84%,#000 25%,transparent 100%)}
 .go-downstairs{left:auto;right:5%;bottom:5%}
 .stage[data-room="upstairs"] .vignette{background:linear-gradient(0deg,#05080955,transparent 25%)}
 @media(max-width:600px) and (orientation:portrait){.backdrop.upstairs{background-size:100% auto;background-position:center top}.go-downstairs{left:auto;right:6%;bottom:42%}}
