@@ -38,7 +38,7 @@ function render(room=state.room){if(room==='garden'&&!state.gardenUnlocked){rest
  spot('打开大门',50,48,()=>render('yard'),28,56);
  }
  if(room==='upstairs'){
- spot('杂物间',13,53,restReminder,9,64);
+ spot('杂物间',13.4,53,restReminder,7,54);
  spot('通往阁楼的木梯',25,45,restReminder,14,76);
  spot('父母的房间',48,47,restReminder,14,48);
  spot('我的房间',75.5,47,restForNight,12,64);
@@ -168,7 +168,7 @@ function cycleTv(){
  feedback(state.tvMode===0?'你关掉了电视。':'电视切换到：'+tvModes[state.tvMode]+'。');
 }
 
-for(const src of ['assets/living-room-v3-on.png','assets/living-room-v3-off.png','assets/entrance-v3-on.png','assets/entrance-v3-off.png','assets/garden-v1.png','assets/upstairs-v1-on.png','assets/upstairs-v1-off.png',...tvImages.slice(1)]){const image=new Image();image.src=src}
+for(const src of ['assets/living-room-v3-on.png','assets/living-room-v3-off.png','assets/entrance-v3-on.png','assets/entrance-v3-off.png','assets/garden-v1.png','assets/upstairs-v2-on.png','assets/upstairs-v2-off.png',...tvImages.slice(1)]){const image=new Image();image.src=src}
 
 function restReminder(){feedback('今天赶路累了，夜深了，先休息。')}
 function firstNightAction(){
