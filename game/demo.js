@@ -1,6 +1,6 @@
 'use strict';
 const $=id=>document.getElementById(id);
-const state={room:'yard',picked:false,read:false,notes:['回乡第一天：检查房子，准备长住和装修。'],started:false,mainLight:false,stairLight:false,tvMode:0,powerOut:false};
+const state={room:'yard',picked:false,read:false,notes:['回乡第一天：检查房子，准备长住和装修。'],started:false,mainLight:false,stairLight:false,tvMode:0,powerOut:false,firstNight:true,gardenUnlocked:false,rested:false};
 const scenes={
  yard:{label:'老宅前院'},
  garden:{label:'屋旁菜园'},
@@ -12,40 +12,42 @@ function addNote(text){if(!state.notes.includes(text))state.notes.push(text)}
 function feedback(text){$('feedback').textContent=text}
 function action(label,fn){const b=document.createElement('button');b.textContent=label;b.onclick=fn;$('actions').append(b)}
 function spot(label,x,y,fn,width=10,height=12){const b=document.createElement('button');b.className='hotspot';b.setAttribute('aria-label',label);b.style.left=x+'%';b.style.top=y+'%';b.style.width=width+'%';b.style.height=height+'%';if(label.includes('开关'))b.style.zIndex='2';b.onclick=fn;$('hotspots').append(b)}
-function render(room=state.room){state.room=room;const data=scenes[room];$('sceneLabel').textContent=data.label;$('clock').textContent=room==='dark'?'22:17':'18:40';$('feedback').textContent='';$('hotspots').replaceChildren();$('actions').replaceChildren();$('backdrop').className='backdrop'+(['living','dark'].includes(room)?' interior':'')+(room==='dark'?' dark':'')+(room==='garden'?' garden':'');$('artNotice').hidden=true;$('stage').dataset.room=room;$('turnBack').hidden=!['living','entrance'].includes(room);$('turnBack').setAttribute('aria-label',room==='entrance'?'转身回到客厅':'向后转身，回到大门口');$('turnBack').querySelector('span').textContent=room==='entrance'?'客厅':'大门口';$('backdrop').classList.toggle('entrance',room==='entrance'||room==='dark');
+function render(room=state.room){if(room==='garden'&&!state.gardenUnlocked){restReminder();return}state.room=room;const data=scenes[room];$('sceneLabel').textContent=data.label;$('clock').textContent=state.firstNight?'21:40':'次日 · 09:10';$('feedback').textContent='';$('hotspots').replaceChildren();$('actions').replaceChildren();$('backdrop').className='backdrop'+(['living','dark'].includes(room)?' interior':'')+(room==='dark'?' dark':'')+(room==='garden'?' garden':'');$('artNotice').hidden=true;$('stage').dataset.room=room;$('turnBack').hidden=!['living','entrance'].includes(room);$('turnBack').setAttribute('aria-label',room==='entrance'?'转身回到客厅':'向后转身，回到大门口');$('turnBack').querySelector('span').textContent=room==='entrance'?'客厅':'大门口';$('backdrop').classList.toggle('entrance',room==='entrance'||room==='dark');
  updateRoomControls();
  if(room==='yard'){
  spot('进入老宅',37,61,()=>render('living'),18,38);
- spot('电闸',61,52,()=>feedback('总闸挂在右侧外墙上。记住它的位置，也许会用得到。'));
- spot('查看菜园',81,64,()=>render('garden'),25,30);
- action(state.read?'打开手机':'查看新短信',phone);
+ spot('电闸',61,52,restReminder);
+ spot('查看菜园',81,64,()=>{if(state.gardenUnlocked)render('garden');else restReminder()});
  }
  if(room==='garden'){
- spot('检查瓜柄',57,43,()=>{feedback('切口很整齐，还没干透。也许刚被人摘走了。');addNote('菜园的南瓜不见了，瓜柄切口很新。')});
+ spot('检查菜梗',40,59,()=>{feedback('断梗的切口还很新。大多数南瓜已经被人摘走了。');addNote('菜园：多处新鲜断梗，成熟南瓜被摘走。')},27,25);
+ spot('检查脚印',80,73,()=>{feedback('湿土上留着成人鞋印，沿着小路向菜园深处延伸。');addNote('菜园：湿土上有成人鞋印，延伸到菜园深处。')},18,37);
  action('回到前院',()=>render('yard'));
  }
  if(room==='living'){
  spot('客厅灯开关',2,39,toggleMainLight,5,12);
  spot('楼梯灯开关',84.8,44,toggleStairLight,5,12);
- spot('爷爷奶奶的卧室',11,48,()=>{feedback('你轻轻转动把手。门紧锁着，里面没有回应。');addNote('一楼爷爷奶奶的卧室门紧锁。')},14,60);
+ spot('爷爷奶奶的卧室',11,48,()=>{if(firstNightAction())return;feedback('你轻轻转动把手。门紧锁着，里面没有回应。');addNote('一楼爷爷奶奶的卧室门紧锁。')},14,60);
  spot('电视',45,50,cycleTv,17,19);
- spot('厨房门',92,48,()=>feedback('厨房门关着。你贴近听了听，里面没有动静。'),14,65);
- spot(state.picked?'查看手电筒':'拿起手电筒',72,86,()=>{if(!state.picked){state.picked=true;addNote('已拿到手电筒。');$('capacity').textContent='1/4'}render('living');feedback('茶几上的手电筒还能用。你把它收进工具箱。')},15,12);
- spot('上楼休息',75,48,()=>{state.powerOut=true;addNote('准备上楼时突然停电。总闸在屋外。');render('dark')},15,48);
+ spot('厨房门',92,48,()=>{if(firstNightAction())return;feedback('厨房门关着。你贴近听了听，里面没有动静。')},14,65);
+ spot(state.picked?'查看手电筒':'拿起手电筒',72,86,()=>{if(firstNightAction())return;if(!state.picked){state.picked=true;addNote('已拿到手电筒。');$('capacity').textContent='1/4'}render('living');feedback('茶几上的手电筒还能用。你把它收进工具箱。')},15,12);
+ spot('上楼休息',75,48,restForNight,15,48);
  }
  if(room==='entrance'){
- spot('查看门锁',50,48,()=>{feedback('门锁完好，已经锁好了。');$('actions').replaceChildren();action('打开门，回到院子',()=>render('yard'))},28,56);
- }
- if(room==='dark'){
- spot('门把手',50,50,()=>{feedback('手指刚碰上去，把手就在另一侧轻轻向下压了一点。你缩回了手。');addNote('有人正在外面试探门把手。');finish()});
- action(state.picked?'打开手电，先听一听':'屏住呼吸，先听一听',()=>{feedback('你没有动。门外的声音也停了。');finish()});
+ spot('查看门锁',50,48,()=>{if(state.firstNight){restReminder();return}feedback('门锁完好，已经锁好了。');$('actions').replaceChildren();action('打开门，回到院子',()=>render('yard'))},28,56);
  }
 }
+
 function finish(){if(!$('actions').querySelector('[data-end]')){action('本段结束 · 返回开始界面',home);$('actions').lastElementChild.dataset.end='true'}}
 function openPanel(title){$('panelTitle').textContent=title;$('panelBody').replaceChildren();$('panel').showModal()}
-function phone(){openPanel('老式手机');$('panelBody').innerHTML='<div class="phone"><div class="phone-label">MOBILE</div><div class="phone-screen" id="phoneScreen"></div><div class="phone-keypad" aria-hidden="true">'+['1','2','3','4','5','6','7','8','9','*','0','#'].map(k=>'<span style="text-align:center">'+k+'</span>').join('')+'</div></div><button class="panel-action" id="readSms">查看奶奶的短信</button><p class="panel-note">只能接打电话与收发短信。当前试玩开放短信。</p>';$('phoneScreen').textContent=state.read?'奶奶 · 短信\n靠墙那几棵南瓜该熟了。摘一个，晚上煮粥。进屋记得锁门。':'18:40    ▂▄▆\n\n1 条未读短信\n来自：奶奶';$('readSms').onclick=()=>{state.read=true;$('unread').hidden=true;addNote('奶奶说菜园靠墙的南瓜应该成熟了。');$('phoneScreen').textContent='奶奶 · 短信\n靠墙那几棵南瓜该熟了。摘一个，晚上煮粥。进屋记得锁门。'};}
-function inventory(){openPanel('工具箱 · '+(state.picked?'1':'0')+' / 4');const bag=document.createElement('div');bag.className='bag';for(let i=0;i<4;i++){const slot=document.createElement(i===0&&state.picked?'button':'div');slot.className='slot'+(i===0&&state.picked?' occupied':'');if(i===0&&state.picked){slot.innerHTML='<svg aria-hidden="true"><use href="#i-light"/></svg><span>手电筒</span>';slot.onclick=()=>{if(state.room==='dark'){closePanel();feedback('手电照向门口。门缝里看不见人，却传来极轻的呼吸声。');finish()}else{slot.querySelector('span').textContent='手电筒 · 可以使用'}}}else slot.textContent='空位';bag.append(slot)}$('panelBody').append(bag);const p=document.createElement('p');p.className='panel-note';p.textContent='最多携带四件物品。试玩中可拾取一支手电筒。';$('panelBody').append(p)}
-function notes(){openPanel('备忘录');const ul=document.createElement('ul');ul.className='notes';for(const text of state.notes){const li=document.createElement('li');li.textContent=text;ul.append(li)}$('panelBody').append(ul)}
+function phone(){
+ if(firstNightAction())return;
+ openPanel('老式手机');
+ $('panelBody').innerHTML='<div class="phone"><div class="phone-label">MOBILE</div><div class="phone-screen">21:40    ▂▄▆\n\n无未接来电\n暂无短信</div></div><p class="panel-note">只能接打电话与收发短信。</p>';
+}
+
+function inventory(){if(firstNightAction())return;openPanel('工具箱 · '+(state.picked?'1':'0')+' / 4');const bag=document.createElement('div');bag.className='bag';for(let i=0;i<4;i++){const slot=document.createElement(i===0&&state.picked?'button':'div');slot.className='slot'+(i===0&&state.picked?' occupied':'');if(i===0&&state.picked){slot.innerHTML='<svg aria-hidden="true"><use href="#i-light"/></svg><span>手电筒</span>';slot.onclick=()=>{if(state.room==='dark'){closePanel();feedback('手电照向门口。门缝里看不见人，却传来极轻的呼吸声。');finish()}else{slot.querySelector('span').textContent='手电筒 · 可以使用'}}}else slot.textContent='空位';bag.append(slot)}$('panelBody').append(bag);const p=document.createElement('p');p.className='panel-note';p.textContent='最多携带四件物品。试玩中可拾取一支手电筒。';$('panelBody').append(p)}
+function notes(){if(firstNightAction())return;openPanel('备忘录');const ul=document.createElement('ul');ul.className='notes';for(const text of state.notes){const li=document.createElement('li');li.textContent=text;ul.append(li)}$('panelBody').append(ul)}
 function closePanel(){$('panel').close()}
 function home(){closePanel();$('gameScreen').hidden=true;$('startScreen').hidden=false;$('startLabel').textContent=state.started?'继续游戏':'开始游戏';$('startGame').focus()}
 $('startGame').onclick=()=>{if(state.started){enterGame()}else{beginPrologue()}};$('home').onclick=home;$('phoneButton').onclick=phone;$('inventoryButton').onclick=inventory;$('notesButton').onclick=notes;$('closePanel').onclick=closePanel;$('hintToggle').onclick=()=>{const hidden=$('stage').classList.toggle('hide-hints');$('hintToggle').textContent='标记：'+(hidden?'关':'开');$('hintToggle').setAttribute('aria-pressed',String(!hidden))};
@@ -127,6 +129,7 @@ function updateRoomControls(){
  const powered=!state.powerOut;
  $('backdrop').classList.toggle('main-light-off',living&&(!state.mainLight||!powered));
  $('backdrop').classList.toggle('entrance-light-off',state.room==='entrance'&&(!state.mainLight||!powered));
+ $('unread').hidden=true;
  $('roomEffects').hidden=!living;
  $('stairLighting').hidden=!(living&&powered&&state.stairLight);
  $('tvPicture').hidden=!(living&&powered&&state.tvMode>0);
@@ -146,9 +149,28 @@ function toggleStairLight(){
  feedback(state.stairLight?'楼梯灯亮了，台阶清楚了一些。':'楼梯灯熄灭了。');
 }
 function cycleTv(){
+ if(firstNightAction())return;
  if(state.powerOut){feedback('电视没有反应，已经停电了。');return}
  state.tvMode=(state.tvMode+1)%tvModes.length;updateRoomControls();
  feedback(state.tvMode===0?'你关掉了电视。':'电视切换到：'+tvModes[state.tvMode]+'。');
 }
 
-for(const src of ['assets/living-room-v3-on.png','assets/living-room-v3-off.png',...tvImages.slice(1)]){const image=new Image();image.src=src}
+for(const src of ['assets/living-room-v3-on.png','assets/living-room-v3-off.png','assets/entrance-v3-on.png','assets/entrance-v3-off.png','assets/garden-v1.png',...tvImages.slice(1)]){const image=new Image();image.src=src}
+
+function restReminder(){feedback('今天赶路累了，夜深了，先休息。')}
+function firstNightAction(){
+ if(state.firstNight&&['living','entrance'].includes(state.room)){restReminder();return true}
+ return false;
+}
+function restForNight(){
+ state.rested=true;
+ addNote('第一晚：上楼休息，一夜平安无事。');
+ openPanel('第一夜');
+ const text=document.createElement('p');text.textContent='你上楼休息。这一夜，平安无事。';$('panelBody').append(text);
+ const hint=document.createElement('p');hint.className='panel-note';hint.textContent='当前试玩到这里。其他房间将在后续加入。';$('panelBody').append(hint);
+}
+// 独立美术预览不解锁正常流程，供画廊检查两条菜园线索。
+if(new URLSearchParams(location.search).get('preview')==='garden'){
+ state.firstNight=false;state.gardenUnlocked=true;state.started=true;enterGame();render('garden');
+ $('artNotice').textContent='菜园互动预览 · 不推进正式剧情';$('artNotice').hidden=false;
+}
