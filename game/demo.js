@@ -16,7 +16,7 @@ function render(room=state.room){state.room=room;const data=scenes[room];$('scen
  if(room==='yard'){
  spot('进入老宅',37,61,()=>render('living'),18,38);
  spot('电闸',61,52,()=>feedback('总闸挂在右侧外墙上。记住它的位置，也许会用得到。'));
- spot('查看菜园',81,64,()=>render('garden'));
+ spot('查看菜园',81,64,()=>render('garden'),25,30);
  action(state.read?'打开手机':'查看新短信',phone);
  }
  if(room==='garden'){
@@ -24,8 +24,9 @@ function render(room=state.room){state.room=room;const data=scenes[room];$('scen
  action('回到前院',()=>render('yard'));
  }
  if(room==='living'){
+ spot('客厅灯开关',5,40,()=>feedback('你按下了灯开关。房间里瞬间亮了起来。'),10,12);
  spot('爷爷奶奶的卧室',11,48,()=>{feedback('你轻轻转动把手。门紧锁着，里面没有回应。');addNote('一楼爷爷奶奶的卧室门紧锁。')},14,60);
- spot('电视',45,51,()=>feedback('电视里正在播放山水风光。'),18,20);
+ spot('电视',45,51,()=>feedback('打开电视，播放的是新闻联播。'),18,20);
  spot('厨房门',92,48,()=>feedback('厨房门关着。你贴近听了听，里面没有动静。'),14,65);
  spot(state.picked?'查看手电筒':'拿起手电筒',72,86,()=>{if(!state.picked){state.picked=true;addNote('已拿到手电筒。');$('capacity').textContent='1/4'}render('living');feedback('茶几上的手电筒还能用。你把它收进工具箱。')},15,12);
  spot('上楼休息',75,48,()=>{addNote('准备上楼时突然停电。总闸在屋外。');render('dark')},15,48);
