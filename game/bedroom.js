@@ -160,6 +160,14 @@ async function showNightEnd(){
  await waitFor(8500);stopStairs();card.hidden=true;
  state.callPhase='morning';card.hidden=false;
  card.innerHTML='<h2 class="day-title">第二天</h2>';
+ await waitFor(2800);enterSecondDay();
+}
+function enterSecondDay(){
+ stopRingtone();stopDialogueAudio();stopStairs();
+ state.firstNight=false;state.gardenUnlocked=true;state.callCompleted=true;state.rested=true;state.callPhase='daytime';
+ try{localStorage.setItem('guizhai-checkpoint','day2')}catch{}
+ $('nightSequence').hidden=true;$('nightSequence').classList.remove('blackout');$('gameScreen').inert=false;
+ state.room='yard';enterGame();syncBackgroundMusic();
 }
 function showBedroomPhone(){
  if(state.callPhase==='ringing'){openIncomingPhone();return true}
@@ -177,3 +185,8 @@ updateSoundButtons();
 if(new URLSearchParams(location.search).get('preview')==='bedroom'){
  state.started=true;enterGame();render('bedroom');
 }
+
+// 到达第二天后刷新仍回到白天院子；独立预览不受存档干扰。
+const previewScene=new URLSearchParams(location.search).get('preview');
+let dayCheckpoint=false;try{dayCheckpoint=localStorage.getItem('guizhai-checkpoint')==='day2'}catch{}
+if(previewScene==='day2'||(!previewScene&&dayCheckpoint))enterSecondDay();

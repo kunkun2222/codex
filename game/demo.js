@@ -17,9 +17,11 @@ function spot(label,x,y,fn,width=10,height=12){const b=document.createElement('b
 function render(room=state.room){if(room==='garden'&&!state.gardenUnlocked){restReminder();return}state.room=room;const data=scenes[room];$('sceneLabel').textContent=data.label;$('clock').textContent=state.firstNight?'21:40':'次日 · 09:10';$('feedback').textContent='';$('hotspots').replaceChildren();$('actions').replaceChildren();$('backdrop').className='backdrop'+(['living','dark'].includes(room)?' interior':'')+(room==='dark'?' dark':'')+(room==='garden'?' garden':'');$('artNotice').hidden=true;$('stage').dataset.room=room;$('turnBack').hidden=!['living','entrance'].includes(room);$('turnBack').setAttribute('aria-label',room==='entrance'?'转身回到客厅':'向后转身，回到大门口');$('turnBack').querySelector('span').textContent=room==='entrance'?'客厅':'大门口';$('backdrop').classList.toggle('entrance',room==='entrance'||room==='dark');
  $('backdrop').classList.toggle('upstairs',room==='upstairs');$('goDownstairs').hidden=!['upstairs','bedroom'].includes(room);$('goDownstairs').setAttribute('aria-label',room==='bedroom'?'返回二楼楼道':'返回一楼');$('goDownstairs').querySelector('span').textContent=room==='bedroom'?'返回楼道':'返回一楼';$('backdrop').classList.toggle('bedroom',room==='bedroom');
  updateRoomControls();
+ $('backdrop').classList.toggle('day-yard',room==='yard'&&!state.firstNight);
+ $('backdrop').classList.toggle('day-garden',room==='garden'&&!state.firstNight);
  if(room==='yard'){
  spot('进入老宅',37,61,()=>render('living'),18,38);
- if(state.gardenUnlocked)spot('查看菜园',81,64,()=>render('garden'));
+ if(state.gardenUnlocked){spot('查看菜园',81,64,()=>render('garden'),28,50);spot('查看门牌',35.5,54.5,()=>feedback('郭家村，43号。'),6,9)}
  }
  if(room==='garden'){
  spot('检查菜梗',40,59,()=>{feedback('断梗的切口还很新。大多数南瓜已经被人摘走了。');addNote('菜园：多处新鲜断梗，成熟南瓜被摘走。')},27,25);
@@ -60,7 +62,20 @@ function phone(){
 }
 
 function inventory(){if(firstNightAction())return;openPanel('工具箱 · '+(state.picked?'1':'0')+' / 4');const bag=document.createElement('div');bag.className='bag';for(let i=0;i<4;i++){const slot=document.createElement(i===0&&state.picked?'button':'div');slot.className='slot'+(i===0&&state.picked?' occupied':'');if(i===0&&state.picked){slot.innerHTML='<svg aria-hidden="true"><use href="#i-light"/></svg><span>手电筒</span>';slot.onclick=()=>{if(state.room==='dark'){closePanel();feedback('手电照向门口。门缝里看不见人，却传来极轻的呼吸声。');finish()}else{slot.querySelector('span').textContent='手电筒 · 可以使用'}}}else slot.textContent='空位';bag.append(slot)}$('panelBody').append(bag);const p=document.createElement('p');p.className='panel-note';p.textContent='最多携带四件物品。试玩中可拾取一支手电筒。';$('panelBody').append(p)}
-function notes(){if(firstNightAction())return;openPanel('备忘录');const ul=document.createElement('ul');ul.className='notes';for(const text of state.notes){const li=document.createElement('li');li.textContent=text;ul.append(li)}$('panelBody').append(ul)}
+function notes(){
+ if(firstNightAction())return;openPanel('备忘录');
+ const ul=document.createElement('ul');ul.className='notes';
+ for(const text of state.notes){const li=document.createElement('li');li.textContent=text;ul.append(li)}
+ $('panelBody').append(ul);
+ if(!state.firstNight){
+  const label=document.createElement('label');label.htmlFor='personalNotes';label.textContent='我的记录';
+  const input=document.createElement('textarea');input.id='personalNotes';input.rows=7;input.placeholder='记下你发现的线索……';
+  try{input.value=localStorage.getItem('guizhai-personal-notes')||''}catch{}
+  const status=document.createElement('p');status.className='panel-note';
+  input.oninput=()=>{try{localStorage.setItem('guizhai-personal-notes',input.value);status.textContent='已自动保存'}catch{status.textContent='浏览器无法保存记录，请先复制保留。'}};
+  $('panelBody').append(label,input,status);
+ }
+}
 function closePanel(){$('panel').close()}
 function home(){closePanel();$('gameScreen').hidden=true;$('startScreen').hidden=false;$('startLabel').textContent=state.started?'继续游戏':'开始游戏';$('startGame').focus()}
 $('startGame').onclick=()=>{if(state.started){enterGame()}else{beginPrologue()}};$('home').onclick=home;$('phoneButton').onclick=phone;$('inventoryButton').onclick=inventory;$('notesButton').onclick=notes;$('closePanel').onclick=closePanel;$('hintToggle').onclick=()=>{const hidden=$('stage').classList.toggle('hide-hints');$('hintToggle').textContent='标记：'+(hidden?'关':'开');$('hintToggle').setAttribute('aria-pressed',String(!hidden))};
