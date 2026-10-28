@@ -34,7 +34,7 @@ function openBlackoutInventory(){
  for(let i=0;i<3;i++){const empty=document.createElement('div');empty.className='slot';empty.textContent='空位';bag.append(empty)}
  $('panelBody').append(bag);return true;
 }
-function powerGameOver(reason,jump=false){
+function powerGameOver(reason,jump=true){
  stopPowerTimer();stopStairs();stopDialogueAudio();stopRingtone();backgroundMusic.pause();
  state.powerTestPhase='over';state.callPhase='gameover';
  $('gameScreen').inert=true;$('powerGameOver').hidden=false;
