@@ -6,6 +6,7 @@ const scenes={
  garden:{label:'屋旁菜园'},
  living:{label:'一楼客厅'},
  upstairs:{label:'二楼楼梯间'},
+ bedroom:{label:'你的卧房'},
  entrance:{label:'一楼大门口'},
  dark:{label:'一楼大门口'}
 };
@@ -14,7 +15,7 @@ function feedback(text){$('feedback').textContent=text}
 function action(label,fn){const b=document.createElement('button');b.textContent=label;b.onclick=fn;$('actions').append(b)}
 function spot(label,x,y,fn,width=10,height=12){const b=document.createElement('button');b.className='hotspot';b.setAttribute('aria-label',label);b.style.left=x+'%';b.style.top=y+'%';b.style.width=width+'%';b.style.height=height+'%';if(label.includes('开关'))b.style.zIndex='2';b.onclick=fn;$('hotspots').append(b)}
 function render(room=state.room){if(room==='garden'&&!state.gardenUnlocked){restReminder();return}state.room=room;const data=scenes[room];$('sceneLabel').textContent=data.label;$('clock').textContent=state.firstNight?'21:40':'次日 · 09:10';$('feedback').textContent='';$('hotspots').replaceChildren();$('actions').replaceChildren();$('backdrop').className='backdrop'+(['living','dark'].includes(room)?' interior':'')+(room==='dark'?' dark':'')+(room==='garden'?' garden':'');$('artNotice').hidden=true;$('stage').dataset.room=room;$('turnBack').hidden=!['living','entrance'].includes(room);$('turnBack').setAttribute('aria-label',room==='entrance'?'转身回到客厅':'向后转身，回到大门口');$('turnBack').querySelector('span').textContent=room==='entrance'?'客厅':'大门口';$('backdrop').classList.toggle('entrance',room==='entrance'||room==='dark');
- $('backdrop').classList.toggle('upstairs',room==='upstairs');$('goDownstairs').hidden=room!=='upstairs';
+ $('backdrop').classList.toggle('upstairs',room==='upstairs');$('goDownstairs').hidden=!['upstairs','bedroom'].includes(room);$('goDownstairs').setAttribute('aria-label',room==='bedroom'?'返回二楼楼道':'返回一楼');$('goDownstairs').querySelector('span').textContent=room==='bedroom'?'返回楼道':'返回一楼';$('backdrop').classList.toggle('bedroom',room==='bedroom');
  updateRoomControls();
  if(room==='yard'){
  spot('进入老宅',37,61,()=>render('living'),18,38);
@@ -37,11 +38,12 @@ function render(room=state.room){if(room==='garden'&&!state.gardenUnlocked){rest
  if(room==='entrance'){
  spot('打开大门',50,48,()=>render('yard'),28,56);
  }
+ if(room==='bedroom')renderBedroom();
  if(room==='upstairs'){
  spot('杂物间',13.4,53,restReminder,7,54);
  spot('通往阁楼的木梯',25,45,restReminder,14,76);
  spot('父母的房间',48,47,restReminder,14,48);
- spot('我的房间',75.5,47,restForNight,12,64);
+ spot('我的房间',75.5,47,()=>render('bedroom'),12,64);
  spot('楼道灯开关',57.2,40.5,toggleHallLight,5,10);
  spot('二楼楼梯灯开关',90.5,55,toggleStairLight,5,10);
  }
@@ -51,6 +53,7 @@ function render(room=state.room){if(room==='garden'&&!state.gardenUnlocked){rest
 function finish(){if(!$('actions').querySelector('[data-end]')){action('本段结束 · 返回开始界面',home);$('actions').lastElementChild.dataset.end='true'}}
 function openPanel(title){$('panelTitle').textContent=title;$('panelBody').replaceChildren();$('panel').showModal()}
 function phone(){
+ if(typeof showBedroomPhone==='function'&&showBedroomPhone())return;
  if(firstNightAction())return;
  openPanel('老式手机');
  $('panelBody').innerHTML='<div class="phone"><div class="phone-label">MOBILE</div><div class="phone-screen">21:40    ▂▄▆\n\n无未接来电\n暂无短信</div></div><p class="panel-note">只能接打电话与收发短信。</p>';
@@ -168,7 +171,7 @@ function cycleTv(){
  feedback(state.tvMode===0?'你关掉了电视。':'电视切换到：'+tvModes[state.tvMode]+'。');
 }
 
-for(const src of ['assets/living-room-v3-on.png','assets/living-room-v3-off.png','assets/entrance-v3-on.png','assets/entrance-v3-off.png','assets/garden-v1.png','assets/upstairs-v2-on.png','assets/upstairs-v2-off.png',...tvImages.slice(1)]){const image=new Image();image.src=src}
+for(const src of ['assets/living-room-v3-on.png','assets/living-room-v3-off.png','assets/entrance-v3-on.png','assets/entrance-v3-off.png','assets/garden-v1.png','assets/upstairs-v2-on.png','assets/upstairs-v2-off.png','assets/bedroom-v1.png',...tvImages.slice(1)]){const image=new Image();image.src=src}
 
 function restReminder(){feedback('今天赶路累了，夜深了，先休息。')}
 function firstNightAction(){
@@ -192,7 +195,7 @@ function toggleHallLight(){
  state.hallLight=!state.hallLight;updateRoomControls();
  feedback(state.hallLight?'楼道灯亮了。左侧通往阁楼的木梯仍没有灯。':'你关掉了楼道灯。');
 }
-$('goDownstairs').onclick=()=>render('living');
+$('goDownstairs').onclick=()=>render(state.room==='bedroom'?'upstairs':'living');
 $('stage').addEventListener('click',event=>{
  if(state.room==='upstairs'&&!event.target.closest('button,a'))restReminder();
 });
