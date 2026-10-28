@@ -1,6 +1,6 @@
 'use strict';
 // 卧室与第一晚电话集中在此文件，便于独立编辑对白和节奏。
-Object.assign(state,{soundEnabled:false,callPhase:'idle',callLine:0,callCompleted:false});
+Object.assign(state,{soundEnabled:true,callPhase:'idle',callLine:0,callCompleted:false});
 const familyDialogue=[
  {speaker:'奶奶',text:'到家了吧？路上累不累？房子好久没住人，你先安顿好，别忙着收拾。'},
  {speaker:'你',text:'到了，奶奶。我刚准备睡觉，东西明天再整理。'},
@@ -8,6 +8,26 @@ const familyDialogue=[
  {speaker:'爷爷 · 电话那头',text:'乖孙孙，过几天爷爷来看你。'},
  {speaker:'奶奶',text:'听见你爷爷说的了吧？别惦记我们。门锁好，被子盖好，睡吧。'}
 ];
+// 原创合成氛围音乐与木楼梯脚步；媒体文件随游戏提供。
+const backgroundMusic=new Audio('assets/audio/old-house-loop.mp3');
+backgroundMusic.loop=true;backgroundMusic.volume=.32;
+let stairsBuffer=null,stairsSource=null,audioStarted=false;
+function syncBackgroundMusic(){
+ backgroundMusic.volume=['ringing','talking'].includes(state.callPhase)?.08:.32;
+ if(!state.soundEnabled||document.hidden||['footsteps','morning','ending'].includes(state.callPhase))backgroundMusic.pause();
+ else if(audioStarted)backgroundMusic.play().catch(()=>{});
+}
+function stopStairs(){if(stairsSource){try{stairsSource.stop()}catch{}stairsSource=null}}
+async function unlockGameAudio(){
+ if(!state.soundEnabled)return;
+ audioStarted=true;syncBackgroundMusic();await prepareAudio();
+}
+function startStairs(){
+ if(!state.soundEnabled||!ringAudio||!stairsBuffer)return;
+ stopStairs();stairsSource=ringAudio.createBufferSource();stairsSource.buffer=stairsBuffer;
+ const gain=ringAudio.createGain();gain.gain.value=.85;
+ stairsSource.connect(gain);gain.connect(ringAudio.destination);stairsSource.start();
+}
 let dialogueAudio=null;
 function stopDialogueAudio(){if(dialogueAudio){dialogueAudio.pause();dialogueAudio.currentTime=0;dialogueAudio=null}}
 function playDialogueAudio(){
@@ -34,7 +54,9 @@ function chooseSleep(){
 }
 async function prepareAudio(){
  if(!state.soundEnabled)return;
- try{ringAudio??=new(window.AudioContext||window.webkitAudioContext)();await ringAudio.resume()}catch{state.soundEnabled=false;updateSoundButtons()}
+ try{ringAudio??=new(window.AudioContext||window.webkitAudioContext)();await ringAudio.resume();
+ if(!stairsBuffer){const response=await fetch('assets/audio/stairs-at-night.mp3');if(response.ok)stairsBuffer=await ringAudio.decodeAudioData(await response.arrayBuffer())}
+ }catch{state.soundEnabled=false;updateSoundButtons()}
 }
 function updateSoundButtons(){
  for(const id of ['soundToggle','soundGameButton']){
@@ -45,10 +67,10 @@ function updateSoundButtons(){
 }
 async function toggleSound(){
  state.soundEnabled=!state.soundEnabled;
- if(state.soundEnabled){await prepareAudio();if(state.callPhase==='ringing')startRingtone()}
- else {stopRingtone();stopDialogueAudio()}
+ if(state.soundEnabled){audioStarted=true;await prepareAudio();if(state.callPhase==='ringing')startRingtone()}
+ else {stopRingtone();stopDialogueAudio();stopStairs()}
  if(state.soundEnabled&&state.callPhase==='talking')playDialogueAudio();
- updateSoundButtons();
+ syncBackgroundMusic();updateSoundButtons();
 }
 function stopRingtone(){
  clearInterval(ringInterval);clearTimeout(ringTimeout);ringInterval=null;ringTimeout=null;
@@ -78,7 +100,7 @@ async function beginSleep(){
  await waitFor(40);$('nightSequence').classList.add('blackout');
  await waitFor(matchMedia('(prefers-reduced-motion: reduce)').matches?80:2050);
  if(state.callCompleted){showNightEnd();return}
- state.callPhase='ringing';showIncoming();startRingtone();
+ state.callPhase='ringing';syncBackgroundMusic();showIncoming();startRingtone();
 }
 function showIncoming(){
  $('nightCard').hidden=false;
@@ -86,7 +108,7 @@ function showIncoming(){
  $('answerCall').onclick=answerCall;$('muteCall').onclick=toggleSound;updateSoundButtons();$('answerCall').focus({preventScroll:true});
 }
 function answerCall(){
- stopRingtone();state.callPhase='talking';state.callLine=0;showCallLine();
+ stopRingtone();state.callPhase='talking';state.callLine=0;syncBackgroundMusic();showCallLine();
 }
 function showCallLine(){
  const line=familyDialogue[state.callLine];
@@ -103,19 +125,28 @@ function completeFamilyCall(){
  addNote('爷爷在电话那头说：“乖孙孙，过几天爷爷来看你。”');
  showNightEnd();
 }
-function showNightEnd(){
- state.callPhase='finished';$('nightCard').hidden=false;
- $('nightCard').innerHTML='<p class="incoming-label">第一夜</p><h2>电话那头，还是熟悉的声音。</h2><p class="call-words">你放下手机，重新躺好。<br>这一夜，平安无事。</p><p class="call-caption">本段试玩结束，次日剧情尚未开放。</p><button id="returnBedroom" class="answer-call">返回卧室查看</button>';
- $('returnBedroom').onclick=()=>{$('nightSequence').hidden=true;$('nightSequence').classList.remove('blackout');$('gameScreen').inert=false;render('bedroom');$('goDownstairs').focus()};$('returnBedroom').focus();
+async function showNightEnd(){
+ if(['ending','footsteps','morning'].includes(state.callPhase))return;
+ state.callPhase='ending';syncBackgroundMusic();
+ const card=$('nightCard');
+ card.classList.add('night-fade-out');
+ await waitFor(matchMedia('(prefers-reduced-motion: reduce)').matches?80:2600);
+ card.hidden=true;card.classList.remove('night-fade-out');
+ state.callPhase='footsteps';startStairs();
+ await waitFor(8500);stopStairs();
+ state.callPhase='morning';card.hidden=false;
+ card.innerHTML='<h2 class="day-title">第二天</h2>';
 }
 function showBedroomPhone(){
  if(state.room!=='bedroom'||!state.callCompleted)return false;
  openPanel('老式手机');const p=document.createElement('p');p.textContent='最近通话：奶奶。暂无短信。';$('panelBody').append(p);return true;
 }
 $('soundToggle').onclick=toggleSound;$('soundGameButton').onclick=toggleSound;
-window.addEventListener('pagehide',()=>{stopRingtone();stopDialogueAudio()});
+window.addEventListener('pagehide',()=>{stopRingtone();stopDialogueAudio();stopStairs();backgroundMusic.pause()});
 window.addEventListener('blur',()=>{stopRingtone();stopDialogueAudio()});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){stopRingtone();stopDialogueAudio()}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){stopRingtone();stopDialogueAudio();stopStairs()}syncBackgroundMusic()});
+document.addEventListener('pointerdown',()=>{unlockGameAudio()},{passive:true});
+document.addEventListener('keydown',()=>{unlockGameAudio()});
 updateSoundButtons();
 
 if(new URLSearchParams(location.search).get('preview')==='bedroom'){

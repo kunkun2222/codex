@@ -78,3 +78,6 @@
 @keyframes call-ring{0%,100%{transform:rotate(-5deg);box-shadow:0 0 0 0 #8a9c6c20}50%{transform:rotate(5deg);box-shadow:0 0 0 14px #8a9c6c00}}@keyframes night-card-in{from{opacity:0}to{opacity:1}}
 @media(max-width:600px) and (orientation:portrait){.backdrop.bedroom{background-size:100% auto;background-position:center top}.sound-toggle{left:16px;top:65px}.night-card h2{font-size:21px}.call-words{font-size:14px}}
 @media(prefers-reduced-motion:reduce){.night-sequence{transition:none}.call-phone-icon,.night-card{animation:none}}
+
+.night-card.night-fade-out{animation:night-card-out 2.6s ease forwards}.day-title{animation:night-card-in 2.5s ease both;font-size:32px!important;letter-spacing:12px!important}@keyframes night-card-out{from{opacity:1}to{opacity:0}}
+@media(prefers-reduced-motion:reduce){.night-card.night-fade-out,.day-title{animation:none;opacity:1}}
