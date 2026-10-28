@@ -16,6 +16,12 @@
 
 ![客厅反向入户门](game/assets/entrance-v3-off.png)
 
+## 女主卧室
+
+![卧室窗台与散落书本](game/assets/bedroom-v1.png)
+
+仅窗台和翻乱的书本、笔记、旧奖状构成调查线索；防盗网暂不开放拆除。
+
 ## 二楼楼梯间
 
 ![二楼三扇关闭房门，左侧木梯通阁楼](game/assets/upstairs-v2-on.png)
