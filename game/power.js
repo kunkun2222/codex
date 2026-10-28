@@ -56,7 +56,7 @@ function resetPowerTest(){
 }
 $('testPowerCut').onclick=triggerPowerCut;
 $('togglePowerCountdown').onclick=()=>{
- if(powerTimer)stopPowerTimer();else if(state.powerTestPhase==='searching')powerTimer=setInterval(()=>{if(!document.hidden)tickPowerTimer()},1000);
+ if(powerTimer)stopPowerTimer();else if(state.powerTestPhase==='searching')powerTimer=setInterval(()=>{if(!document.hidden&&!document.body.classList.contains('portrait-blocked'))tickPowerTimer()},1000);
  updatePowerTest();
 };
 for(const [id,delta] of [['lessPowerTime',-5],['morePowerTime',5]])$(id).onclick=()=>{

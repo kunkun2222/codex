@@ -14,12 +14,12 @@ backgroundMusic.loop=true;backgroundMusic.volume=.32;
 let stairsBuffer=null,stairsSource=null,audioStarted=false;
 function syncBackgroundMusic(){
  backgroundMusic.volume=['ringing','talking'].includes(state.callPhase)?.08:.32;
- if(!state.soundEnabled||document.hidden||['footsteps','morning','ending','power-cut','gameover'].includes(state.callPhase))backgroundMusic.pause();
+ if(!state.soundEnabled||document.hidden||document.body.classList.contains('portrait-blocked')||['footsteps','morning','ending','power-cut','gameover'].includes(state.callPhase))backgroundMusic.pause();
  else if(audioStarted)backgroundMusic.play().catch(()=>{});
 }
 function stopStairs(){if(stairsSource){try{stairsSource.stop()}catch{}stairsSource=null}}
 async function unlockGameAudio(){
- if(!state.soundEnabled)return;
+ if(!state.soundEnabled||document.body.classList.contains('portrait-blocked'))return;
  audioStarted=true;syncBackgroundMusic();await prepareAudio();
 }
 function startStairs(){
