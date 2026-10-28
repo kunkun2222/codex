@@ -9,7 +9,7 @@ const familyDialogue=[
  {speaker:'奶奶',text:'听见你爷爷说的了吧？别惦记我们。门锁好，被子盖好，睡吧。'}
 ];
 // 原创合成氛围音乐与木楼梯脚步；媒体文件随游戏提供。
-const backgroundMusic=new Audio('assets/audio/old-house-loop.mp3');
+const backgroundMusic=new Audio('assets/audio/old-house-loop-v2.mp3');
 backgroundMusic.loop=true;backgroundMusic.volume=.32;
 let stairsBuffer=null,stairsSource=null,audioStarted=false;
 function syncBackgroundMusic(){
@@ -35,6 +35,7 @@ function playDialogueAudio(){
  const clip={0:'grandma-01',2:'grandma-03',3:'grandpa-04',4:'grandma-05'}[state.callLine];
  if(!state.soundEnabled||state.callPhase!=='talking'||!clip)return;
  dialogueAudio=new Audio('assets/audio/'+clip+'.mp3');
+ dialogueAudio.onended=()=>{if(state.callPhase==='talking'){if(state.callLine<familyDialogue.length-1){state.callLine++;showCallLine()}else showHangup()}};
  dialogueAudio.play().catch(()=>{const caption=document.querySelector('.call-caption');if(caption)caption.textContent='配音未能播放，可继续阅读字幕。'});
 }
 let ringAudio=null,ringMaster=null,ringInterval=null,ringTimeout=null;
@@ -55,7 +56,7 @@ function chooseSleep(){
 async function prepareAudio(){
  if(!state.soundEnabled)return;
  try{ringAudio??=new(window.AudioContext||window.webkitAudioContext)();await ringAudio.resume();
- if(!stairsBuffer){const response=await fetch('assets/audio/stairs-at-night.mp3');if(response.ok)stairsBuffer=await ringAudio.decodeAudioData(await response.arrayBuffer())}
+ if(!stairsBuffer){const response=await fetch('assets/audio/stairs-at-night-v2.mp3');if(response.ok)stairsBuffer=await ringAudio.decodeAudioData(await response.arrayBuffer())}
  }catch{state.soundEnabled=false;updateSoundButtons()}
 }
 function updateSoundButtons(){
@@ -80,17 +81,17 @@ function stopRingtone(){
 }
 function ringPulse(){
  if(!state.soundEnabled||!ringAudio||ringAudio.state!=='running')return;
- ringMaster=ringAudio.createGain();ringMaster.gain.value=.075;ringMaster.connect(ringAudio.destination);
- for(const offset of [0,.37]){
-  const gain=ringAudio.createGain(),t=ringAudio.currentTime+offset;
-  gain.gain.setValueAtTime(0,t);gain.gain.linearRampToValueAtTime(.5,t+.01);gain.gain.setValueAtTime(.5,t+.23);gain.gain.linearRampToValueAtTime(0,t+.26);gain.connect(ringMaster);
-  for(const frequency of [880,1175]){const osc=ringAudio.createOscillator();osc.type='square';osc.frequency.value=frequency;osc.connect(gain);ringNodes.add(osc);osc.onended=()=>ringNodes.delete(osc);osc.start(t);osc.stop(t+.27)}
- }
+ ringMaster=ringAudio.createGain();ringMaster.gain.value=.12;ringMaster.connect(ringAudio.destination);
+ [784,988,1175,988,784,988].forEach((frequency,i)=>{
+  const t=ringAudio.currentTime+i*.17,gain=ringAudio.createGain(),osc=ringAudio.createOscillator();
+  gain.gain.setValueAtTime(0,t);gain.gain.linearRampToValueAtTime(.45,t+.008);gain.gain.exponentialRampToValueAtTime(.001,t+.14);gain.connect(ringMaster);
+  osc.type='triangle';osc.frequency.value=frequency;osc.connect(gain);ringNodes.add(osc);osc.onended=()=>ringNodes.delete(osc);osc.start(t);osc.stop(t+.15);
+ });
 }
 function startRingtone(){
  stopRingtone();if(!state.soundEnabled)return;
  ringPulse();ringInterval=setInterval(ringPulse,1800);
- ringTimeout=setTimeout(stopRingtone,12000);
+ // 来电保持响铃，直到玩家接听或关闭声音。
 }
 async function beginSleep(){
  if(['fading','ringing','talking'].includes(state.callPhase))return;
@@ -103,21 +104,43 @@ async function beginSleep(){
  state.callPhase='ringing';syncBackgroundMusic();showIncoming();startRingtone();
 }
 function showIncoming(){
+ $('unread').hidden=false;
  $('nightCard').hidden=false;
- $('nightCard').innerHTML='<p class="incoming-label">来电</p><h2>奶奶</h2><div class="call-phone-icon" aria-hidden="true"><svg viewBox="0 0 32 32"><use href="#i-phone"/></svg></div><p>手机突然响了起来。</p><button id="answerCall" class="answer-call">接听电话</button><button id="muteCall" class="call-mute"></button>';
- $('answerCall').onclick=answerCall;$('muteCall').onclick=toggleSound;updateSoundButtons();$('answerCall').focus({preventScroll:true});
+ $('nightCard').innerHTML='<button id="nightPhoneButton" class="night-phone-launch" aria-label="打开来电手机"><svg viewBox="0 0 32 32"><use href="#i-phone"/></svg><i class="call-dot"></i><span>手机</span></button>';
+ $('nightPhoneButton').onclick=openIncomingPhone;
+ $('nightPhoneButton').focus({preventScroll:true});
+}
+function phoneShell(){
+ $('nightCard').innerHTML='<div class="retro-phone"><div class="retro-speaker"></div><div class="retro-brand">MOBILE</div><div class="retro-screen"><div class="retro-status">▂▄▆ <span>▰</span></div><h2>奶奶</h2><div id="phoneStatus" class="retro-call-status"></div></div><div id="phoneSubtitle" class="player-subtitle" aria-live="polite"></div><div class="retro-softkeys"><button id="phoneAccept" class="phone-accept" aria-label="接通电话"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3 3 5c-1 7 9 17 16 16l2-3-5-4-2 2c-3-1-5-3-6-6l2-2Z"/></svg></button><button id="phoneEnd" class="phone-end" aria-label="挂断电话"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 14v-4c5-5 13-5 18 0v4l-5-1v-3h-8v3Z"/></svg></button></div><div class="retro-keypad" aria-hidden="true">'+['1','2 ABC','3 DEF','4 GHI','5 JKL','6 MNO','7 PQRS','8 TUV','9 WXYZ','*','0','＃'].map(k=>'<span>'+k+'</span>').join('')+'</div></div>';
+}
+function openIncomingPhone(){
+ phoneShell();$('phoneStatus').textContent='来电';
+ $('phoneAccept').onclick=answerCall;
+ $('phoneEnd').disabled=true;
+ $('phoneAccept').focus({preventScroll:true});
 }
 function answerCall(){
- stopRingtone();state.callPhase='talking';state.callLine=0;syncBackgroundMusic();showCallLine();
+ stopRingtone();$('unread').hidden=true;state.callPhase='talking';state.callLine=0;syncBackgroundMusic();showCallLine();
+}
+function showHangup(){
+ $('phoneStatus').textContent='通话结束';$('phoneEnd').disabled=false;$('phoneEnd').onclick=completeFamilyCall;
+ $('phoneAccept').disabled=true;
+ $('phoneEnd').focus({preventScroll:true});
 }
 function showCallLine(){
- const line=familyDialogue[state.callLine];
- $('nightCard').innerHTML='<p class="incoming-label">通话中 · 奶奶</p><h2 id="callSpeaker"></h2><p id="callWords" class="call-words" aria-live="polite"></p><button id="nextCallLine" class="answer-call"></button><p class="call-caption">爷爷奶奶已有配音，你的对白以字幕呈现</p>';
- $('callSpeaker').textContent=line.speaker;$('callWords').textContent=line.text;
- $('nextCallLine').textContent=state.callLine===familyDialogue.length-1?'挂断电话':'继续听';
- $('nextCallLine').onclick=()=>{if(state.callLine<familyDialogue.length-1){state.callLine++;showCallLine()}else completeFamilyCall()};
- playDialogueAudio();
- $('nextCallLine').focus({preventScroll:true});
+ stopDialogueAudio();
+ const line=familyDialogue[state.callLine];phoneShell();
+ $('phoneStatus').textContent='通话中';
+ $('phoneEnd').disabled=true;
+ const advance=()=>{if(state.callLine<familyDialogue.length-1){state.callLine++;showCallLine()}else showHangup()};
+ if(line.speaker==='你'){
+  const subtitle=$('phoneSubtitle');subtitle.textContent=line.text;subtitle.tabIndex=0;subtitle.setAttribute('role','button');subtitle.setAttribute('aria-label',line.text+' 点击继续');subtitle.onclick=advance;subtitle.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();advance()}};
+  $('phoneAccept').onclick=advance;subtitle.focus({preventScroll:true});
+ }else{
+  // 听家人说话时不显示台词；无声模式仍能用接听键推进。
+  $('phoneAccept').onclick=advance;
+  playDialogueAudio();
+ }
 }
 function completeFamilyCall(){
  stopRingtone();stopDialogueAudio();state.callCompleted=true;state.rested=true;
@@ -133,11 +156,13 @@ async function showNightEnd(){
  await waitFor(matchMedia('(prefers-reduced-motion: reduce)').matches?80:2600);
  card.hidden=true;card.classList.remove('night-fade-out');
  state.callPhase='footsteps';startStairs();
- await waitFor(8500);stopStairs();
+ card.hidden=false;card.innerHTML='<p class="stairs-thought">楼梯的声音？谁在上楼？<br>应该是我听错了吧……</p>';
+ await waitFor(8500);stopStairs();card.hidden=true;
  state.callPhase='morning';card.hidden=false;
  card.innerHTML='<h2 class="day-title">第二天</h2>';
 }
 function showBedroomPhone(){
+ if(state.callPhase==='ringing'){openIncomingPhone();return true}
  if(state.room!=='bedroom'||!state.callCompleted)return false;
  openPanel('老式手机');const p=document.createElement('p');p.textContent='最近通话：奶奶。暂无短信。';$('panelBody').append(p);return true;
 }
