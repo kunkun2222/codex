@@ -8,6 +8,15 @@ const familyDialogue=[
  {speaker:'爷爷 · 电话那头',text:'乖孙孙，过几天爷爷来看你。'},
  {speaker:'奶奶',text:'听见你爷爷说的了吧？别惦记我们。门锁好，被子盖好，睡吧。'}
 ];
+let dialogueAudio=null;
+function stopDialogueAudio(){if(dialogueAudio){dialogueAudio.pause();dialogueAudio.currentTime=0;dialogueAudio=null}}
+function playDialogueAudio(){
+ stopDialogueAudio();
+ const clip={0:'grandma-01',2:'grandma-03',3:'grandpa-04',4:'grandma-05'}[state.callLine];
+ if(!state.soundEnabled||state.callPhase!=='talking'||!clip)return;
+ dialogueAudio=new Audio('assets/audio/'+clip+'.mp3');
+ dialogueAudio.play().catch(()=>{const caption=document.querySelector('.call-caption');if(caption)caption.textContent='配音未能播放，可继续阅读字幕。'});
+}
 let ringAudio=null,ringMaster=null,ringInterval=null,ringTimeout=null;
 const ringNodes=new Set();
 function renderBedroom(){
@@ -30,14 +39,15 @@ async function prepareAudio(){
 function updateSoundButtons(){
  for(const id of ['soundToggle','soundGameButton']){
   $(id).setAttribute('aria-pressed',String(state.soundEnabled));
-  $(id).textContent=state.soundEnabled?'铃声：开':'铃声：关'+(id==='soundToggle'?' · 点击开启':'');
+  $(id).textContent=state.soundEnabled?'声音：开':'声音：关'+(id==='soundToggle'?' · 点击开启':'');
  }
- if($('muteCall'))$('muteCall').textContent=state.soundEnabled?'关闭铃声':'开启铃声';
+ if($('muteCall'))$('muteCall').textContent=state.soundEnabled?'关闭声音':'开启声音';
 }
 async function toggleSound(){
  state.soundEnabled=!state.soundEnabled;
  if(state.soundEnabled){await prepareAudio();if(state.callPhase==='ringing')startRingtone()}
- else stopRingtone();
+ else {stopRingtone();stopDialogueAudio()}
+ if(state.soundEnabled&&state.callPhase==='talking')playDialogueAudio();
  updateSoundButtons();
 }
 function stopRingtone(){
@@ -80,14 +90,15 @@ function answerCall(){
 }
 function showCallLine(){
  const line=familyDialogue[state.callLine];
- $('nightCard').innerHTML='<p class="incoming-label">通话中 · 奶奶</p><h2 id="callSpeaker"></h2><p id="callWords" class="call-words" aria-live="polite"></p><button id="nextCallLine" class="answer-call"></button><p class="call-caption">当前为文字对白，暂无人物配音</p>';
+ $('nightCard').innerHTML='<p class="incoming-label">通话中 · 奶奶</p><h2 id="callSpeaker"></h2><p id="callWords" class="call-words" aria-live="polite"></p><button id="nextCallLine" class="answer-call"></button><p class="call-caption">爷爷奶奶已有配音，你的对白以字幕呈现</p>';
  $('callSpeaker').textContent=line.speaker;$('callWords').textContent=line.text;
  $('nextCallLine').textContent=state.callLine===familyDialogue.length-1?'挂断电话':'继续听';
  $('nextCallLine').onclick=()=>{if(state.callLine<familyDialogue.length-1){state.callLine++;showCallLine()}else completeFamilyCall()};
+ playDialogueAudio();
  $('nextCallLine').focus({preventScroll:true});
 }
 function completeFamilyCall(){
- stopRingtone();state.callCompleted=true;state.rested=true;
+ stopRingtone();stopDialogueAudio();state.callCompleted=true;state.rested=true;
  addNote('奶奶来电：明天去菜园，摘靠墙的南瓜。');
  addNote('爷爷在电话那头说：“乖孙孙，过几天爷爷来看你。”');
  showNightEnd();
@@ -102,9 +113,9 @@ function showBedroomPhone(){
  openPanel('老式手机');const p=document.createElement('p');p.textContent='最近通话：奶奶。暂无短信。';$('panelBody').append(p);return true;
 }
 $('soundToggle').onclick=toggleSound;$('soundGameButton').onclick=toggleSound;
-window.addEventListener('pagehide',stopRingtone);
-window.addEventListener('blur',stopRingtone);
-document.addEventListener('visibilitychange',()=>{if(document.hidden)stopRingtone()});
+window.addEventListener('pagehide',()=>{stopRingtone();stopDialogueAudio()});
+window.addEventListener('blur',()=>{stopRingtone();stopDialogueAudio()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){stopRingtone();stopDialogueAudio()}});
 updateSoundButtons();
 
 if(new URLSearchParams(location.search).get('preview')==='bedroom'){
