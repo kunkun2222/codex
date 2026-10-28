@@ -9,12 +9,12 @@ const familyDialogue=[
  {speaker:'奶奶',text:'听见你爷爷说的了吧？别惦记我们。门锁好，被子盖好，睡吧。'}
 ];
 // 原创合成氛围音乐与木楼梯脚步；媒体文件随游戏提供。
-const backgroundMusic=new Audio('assets/audio/old-house-loop-v2.mp3');
+const backgroundMusic=new Audio('assets/audio/renxingguan-instrumental.mp3');
 backgroundMusic.loop=true;backgroundMusic.volume=.32;
 let stairsBuffer=null,stairsSource=null,audioStarted=false;
 function syncBackgroundMusic(){
  backgroundMusic.volume=['ringing','talking'].includes(state.callPhase)?.08:.32;
- if(!state.soundEnabled||document.hidden||['footsteps','morning','ending'].includes(state.callPhase))backgroundMusic.pause();
+ if(!state.soundEnabled||document.hidden||['footsteps','morning','ending','power-cut','gameover'].includes(state.callPhase))backgroundMusic.pause();
  else if(audioStarted)backgroundMusic.play().catch(()=>{});
 }
 function stopStairs(){if(stairsSource){try{stairsSource.stop()}catch{}stairsSource=null}}
@@ -160,14 +160,14 @@ async function showNightEnd(){
  await waitFor(8500);stopStairs();card.hidden=true;
  state.callPhase='morning';card.hidden=false;
  card.innerHTML='<h2 class="day-title">第二天</h2>';
- await waitFor(2800);enterSecondDay();
+ await waitFor(1000);enterSecondDay();
 }
 function enterSecondDay(){
  stopRingtone();stopDialogueAudio();stopStairs();
  state.firstNight=false;state.gardenUnlocked=true;state.callCompleted=true;state.rested=true;state.callPhase='daytime';
  try{localStorage.setItem('guizhai-checkpoint','day2')}catch{}
  $('nightSequence').hidden=true;$('nightSequence').classList.remove('blackout');$('gameScreen').inert=false;
- state.room='yard';enterGame();syncBackgroundMusic();
+ state.room='yard';enterGame();syncBackgroundMusic();if(typeof updatePowerTest==='function')updatePowerTest();
 }
 function showBedroomPhone(){
  if(state.callPhase==='ringing'){openIncomingPhone();return true}
