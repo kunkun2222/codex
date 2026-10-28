@@ -12,9 +12,9 @@ let dialogueAudio=null;
 function stopDialogueAudio(){if(dialogueAudio){dialogueAudio.pause();dialogueAudio.currentTime=0;dialogueAudio=null}}
 function playDialogueAudio(){
  stopDialogueAudio();
- const clip={0:'01',2:'03',4:'05'}[state.callLine];
+ const clip={0:'grandma-01',2:'grandma-03',3:'grandpa-04',4:'grandma-05'}[state.callLine];
  if(!state.soundEnabled||state.callPhase!=='talking'||!clip)return;
- dialogueAudio=new Audio('assets/audio/grandma-'+clip+'.mp3');
+ dialogueAudio=new Audio('assets/audio/'+clip+'.mp3');
  dialogueAudio.play().catch(()=>{const caption=document.querySelector('.call-caption');if(caption)caption.textContent='配音未能播放，可继续阅读字幕。'});
 }
 let ringAudio=null,ringMaster=null,ringInterval=null,ringTimeout=null;
@@ -90,7 +90,7 @@ function answerCall(){
 }
 function showCallLine(){
  const line=familyDialogue[state.callLine];
- $('nightCard').innerHTML='<p class="incoming-label">通话中 · 奶奶</p><h2 id="callSpeaker"></h2><p id="callWords" class="call-words" aria-live="polite"></p><button id="nextCallLine" class="answer-call"></button><p class="call-caption">奶奶已有配音，其他角色暂以字幕呈现</p>';
+ $('nightCard').innerHTML='<p class="incoming-label">通话中 · 奶奶</p><h2 id="callSpeaker"></h2><p id="callWords" class="call-words" aria-live="polite"></p><button id="nextCallLine" class="answer-call"></button><p class="call-caption">爷爷奶奶已有配音，你的对白以字幕呈现</p>';
  $('callSpeaker').textContent=line.speaker;$('callWords').textContent=line.text;
  $('nextCallLine').textContent=state.callLine===familyDialogue.length-1?'挂断电话':'继续听';
  $('nextCallLine').onclick=()=>{if(state.callLine<familyDialogue.length-1){state.callLine++;showCallLine()}else completeFamilyCall()};
