@@ -83,7 +83,7 @@ $('startGame').onclick=()=>{if(state.started){enterGame()}else{beginPrologue()}}
 // 背景加载完成后，留出一秒纯场景，再淡入开始界面。
 async function revealStartScreen(){
  const background=new Image();
- background.src='assets/house-exterior-v5.png';
+ background.src='assets/house-exterior-v5.webp';
  try{await background.decode()}catch{/* 图片无法加载时仍允许进入游戏。 */}
  requestAnimationFrame(()=>requestAnimationFrame(()=>{
   $('startScreen').dataset.backgroundReady='true';
@@ -186,7 +186,7 @@ function cycleTv(){
  feedback(state.tvMode===0?'你关掉了电视。':'电视切换到：'+tvModes[state.tvMode]+'。');
 }
 
-for(const src of ['assets/living-room-v3-on.png','assets/living-room-v3-off.png','assets/entrance-v3-on.png','assets/entrance-v3-off.png','assets/garden-v1.png','assets/upstairs-v2-on.png','assets/upstairs-v2-off.png','assets/bedroom-v1.png',...tvImages.slice(1)]){const image=new Image();image.src=src}
+for(const src of ['assets/living-room-v3-on.webp','assets/living-room-v3-off.webp','assets/entrance-v3-on.webp','assets/entrance-v3-off.webp','assets/garden-v1.webp','assets/upstairs-v2-on.webp','assets/upstairs-v2-off.webp','assets/bedroom-v1.webp',...tvImages.slice(1)]){const image=new Image();image.src=src}
 
 function restReminder(){feedback('今天赶路累了，夜深了，先休息。')}
 function firstNightAction(){
