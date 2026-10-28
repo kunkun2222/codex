@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b0d0e"><title>归宅</title><link rel="preload" as="image" href="assets/house-exterior-v5.png" fetchpriority="high"><link rel="stylesheet" href="play.css?v=bedroom-1"></head>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b0d0e"><title>归宅</title><link rel="preload" as="image" href="assets/house-exterior-v5.png" fetchpriority="high"><link rel="stylesheet" href="play.css?v=night-audio-3"></head>
 <body>
 <svg class="symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
 <symbol id="i-phone" viewBox="0 0 32 32"><rect x="8" y="2" width="16" height="28" rx="3"/><path d="M12 5h8M11 9h10v10H11zM11 23h2m6 0h2m-10 3h2m6 0h2m-6-3h2m-2 3h2"/></symbol>
@@ -11,7 +11,7 @@
 <section id="startScreen" class="start-screen" inert aria-label="开始界面">
 <div class="start-shade"></div><a class="gallery-link" href="gallery.html">场景画廊 ↗</a>
 <div class="start-content"><h1 class="horror-title" aria-label="归宅"><span aria-hidden="true">归</span><span aria-hidden="true">宅</span></h1><button id="startGame" class="start-button"><svg class="start-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M7 28V4h16v24M7 4l11 4v20l-11-3M12 16h1M4 28h23"/></svg><span id="startLabel">开始游戏</span></button></div>
-<button id="soundToggle" class="sound-toggle" aria-pressed="false">铃声：关 · 点击开启</button><p class="start-footer">本游戏含恐怖、惊吓及紧张情节，请酌情体验。</p>
+<button id="soundToggle" class="sound-toggle" aria-pressed="true">声音：开</button><p class="start-footer">本游戏含恐怖、惊吓及紧张情节，请酌情体验。</p>
 </section>
 <section id="prologue" class="prologue" aria-label="故事序幕" hidden>
 <div class="prologue-content" id="prologueText" aria-live="polite"></div>
@@ -22,9 +22,9 @@
 <header class="hud"><button id="home" class="wordmark" aria-label="返回开始界面">归宅</button><div><span id="sceneLabel"></span><span class="separator">/</span><time id="clock"></time></div><a href="gallery.html" aria-label="查看场景画廊">画廊 ↗</a></header>
 <div class="stage-wrap"><section id="stage" class="stage" aria-label="可探索的画面"><div id="backdrop" class="backdrop"></div><div id="roomEffects" class="room-effects" aria-hidden="true"><div id="stairLighting" class="stair-lighting" hidden></div><div id="landingStairLighting" class="landing-stair-lighting" hidden></div><div id="tvPicture" class="tv-picture" hidden></div></div><div class="vignette"></div><div id="hotspots" class="hotspots"></div><button id="turnBack" class="turn-back" aria-label="向后转身，回到大门口" hidden><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M25 8v8a7 7 0 0 1-7 7H6m7-7-7 7 7 7"/></svg><span>大门口</span></button><button id="goDownstairs" class="turn-back go-downstairs" aria-label="返回一楼" hidden><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 6v12h18m-7-7 7 7-7 7"/></svg><span>返回一楼</span></button><span id="artNotice" class="art-notice" hidden>室内早期概念 · 待重绘</span>
 <section class="narration" aria-label="交互反馈"><div id="actions" class="actions"></div><p id="feedback" role="status"></p></section></section></div>
-<footer class="toolbar"><span class="toolbar-hint">点击画面中的标记探索</span><nav aria-label="随身工具栏"><button id="phoneButton" class="tool" aria-haspopup="dialog"><svg><use href="#i-phone"/></svg><span>手机</span><i id="unread" class="unread" hidden></i></button><button id="inventoryButton" class="tool" aria-haspopup="dialog"><svg><use href="#i-case"/></svg><span>工具箱</span><small id="capacity">0/4</small></button><button id="notesButton" class="tool" aria-haspopup="dialog"><svg><use href="#i-note"/></svg><span>备忘录</span></button></nav><button id="soundGameButton" class="sound-game-button" aria-pressed="false">铃声：关</button><button id="hintToggle" class="hint-toggle" aria-pressed="true">标记：开</button></footer>
+<footer class="toolbar"><span class="toolbar-hint">点击画面中的标记探索</span><nav aria-label="随身工具栏"><button id="phoneButton" class="tool" aria-haspopup="dialog"><svg><use href="#i-phone"/></svg><span>手机</span><i id="unread" class="unread" hidden></i></button><button id="inventoryButton" class="tool" aria-haspopup="dialog"><svg><use href="#i-case"/></svg><span>工具箱</span><small id="capacity">0/4</small></button><button id="notesButton" class="tool" aria-haspopup="dialog"><svg><use href="#i-note"/></svg><span>备忘录</span></button></nav><button id="soundGameButton" class="sound-game-button" aria-pressed="true">声音：开</button><button id="hintToggle" class="hint-toggle" aria-pressed="true">标记：开</button></footer>
 </section>
 </main>
 <section id="nightSequence" class="night-sequence" aria-label="入睡与电话" hidden><div id="nightCard" class="night-card" hidden></div></section>
 <dialog id="panel" aria-labelledby="panelTitle"><header class="panel-header"><h2 id="panelTitle"></h2><button id="closePanel" aria-label="关闭面板">关闭 ×</button></header><div id="panelBody"></div></dialog>
-<script src="demo.js?v=bedroom-1"></script><script src="bedroom.js?v=family-voice-2"></script></body></html>
+<script src="demo.js?v=bedroom-1"></script><script src="bedroom.js?v=night-audio-3"></script></body></html>
