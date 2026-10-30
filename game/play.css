@@ -92,4 +92,4 @@
 
 #powerGameOver.with-jumpscare{isolation:isolate}#jumpScare{z-index:0}.with-jumpscare .game-over-card{z-index:1;align-self:end;width:100%;padding:12px 20px 18px;background:linear-gradient(transparent,#080607ed);box-shadow:none;animation:game-over-reveal 1.8s both}.with-jumpscare .game-over-card h2{margin:10px 0;font-size:22px}.with-jumpscare .game-over-card p{margin:6px 0}
 
-.backdrop.rearHall{background-image:url('assets/rear-hall-v1.webp')}.backdrop.kitchen{background-image:url('assets/kitchen-v1.webp')}.backdrop.bathroom{background-image:url('assets/bathroom-v1.webp')}
+.backdrop.rearHall{background-image:url('assets/rear-hall-v1.webp')}.backdrop.kitchen{background-image:url('assets/kitchen-v2.webp')}.backdrop.bathroom{background-image:url('assets/bathroom-v2.webp')}
