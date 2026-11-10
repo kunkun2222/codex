@@ -104,6 +104,7 @@ async function beginSleep(){
  state.callPhase='ringing';syncBackgroundMusic();showIncoming();startRingtone();
 }
 function showIncoming(){
+ if(typeof saveProgress==='function')saveProgress();
  $('unread').hidden=false;
  $('nightCard').hidden=false;
  $('nightCard').innerHTML='<button id="nightPhoneButton" class="night-phone-launch" aria-label="打开来电手机"><svg viewBox="0 0 32 32"><use href="#i-phone"/></svg><i class="call-dot"></i><span>手机</span></button>';
@@ -128,6 +129,7 @@ function showHangup(){
  $('phoneEnd').focus({preventScroll:true});
 }
 function showCallLine(){
+ if(typeof saveProgress==='function')saveProgress();
  stopDialogueAudio();
  const line=familyDialogue[state.callLine];phoneShell();
  $('phoneStatus').textContent='通话中';
@@ -151,6 +153,7 @@ function completeFamilyCall(){
 async function showNightEnd(){
  if(['ending','footsteps','morning'].includes(state.callPhase))return;
  state.callPhase='ending';syncBackgroundMusic();
+ if(typeof saveProgress==='function')saveProgress();
  const card=$('nightCard');
  card.classList.add('night-fade-out');
  await waitFor(matchMedia('(prefers-reduced-motion: reduce)').matches?80:2600);
@@ -165,7 +168,7 @@ async function showNightEnd(){
 function enterSecondDay(){
  stopRingtone();stopDialogueAudio();stopStairs();
  state.firstNight=false;state.gardenUnlocked=true;state.callCompleted=true;state.rested=true;state.callPhase='daytime';
- try{localStorage.setItem('guizhai-checkpoint','day2')}catch{}
+ if(!new URLSearchParams(location.search).has('preview'))try{localStorage.setItem('guizhai-checkpoint','day2')}catch{}
  $('nightSequence').hidden=true;$('nightSequence').classList.remove('blackout');$('gameScreen').inert=false;
  state.room='yard';enterGame();syncBackgroundMusic();if(typeof updatePowerTest==='function')updatePowerTest();
 }
@@ -186,7 +189,6 @@ if(new URLSearchParams(location.search).get('preview')==='bedroom'){
  state.started=true;enterGame();render('bedroom');
 }
 
-// 到达第二天后刷新仍回到白天院子；独立预览不受存档干扰。
+// 正式存档由 save.js 恢复；画廊仍可独立预览第二天。
 const previewScene=new URLSearchParams(location.search).get('preview');
-let dayCheckpoint=false;try{dayCheckpoint=localStorage.getItem('guizhai-checkpoint')==='day2'}catch{}
-if(previewScene==='day2'||(!previewScene&&dayCheckpoint))enterSecondDay();
+if(previewScene==='day2')enterSecondDay();

@@ -1,6 +1,6 @@
 'use strict';
 const $=id=>document.getElementById(id);
-const state={room:'yard',picked:false,read:false,notes:['回乡第一天：检查房子，准备长住和装修。'],started:false,mainLight:false,stairLight:false,hallLight:false,tvMode:0,powerOut:false,firstNight:true,gardenUnlocked:false,rested:false};
+const state={room:'yard',picked:false,items:[],storageUnlocked:false,dayLightsSet:false,read:false,notes:['回乡第一天：检查房子，准备长住和装修。'],started:false,mainLight:false,stairLight:false,hallLight:false,tvMode:0,powerOut:false,firstNight:true,gardenUnlocked:false,rested:false};
 const scenes={
  yard:{label:'老宅前院'},
  garden:{label:'屋旁菜园'},
@@ -10,6 +10,8 @@ const scenes={
  living:{label:'一楼客厅'},
  upstairs:{label:'二楼楼梯间'},
  bedroom:{label:'你的卧房'},
+ grandparents:{label:'爷爷奶奶的卧室'},
+ drawer:{label:'缝纫机抽屉'},
  entrance:{label:'一楼大门口'},
  dark:{label:'一楼大门口'}
 };
@@ -17,7 +19,7 @@ function addNote(text){if(!state.notes.includes(text))state.notes.push(text)}
 function feedback(text){$('feedback').textContent=text}
 function action(label,fn){const b=document.createElement('button');b.textContent=label;b.onclick=fn;$('actions').append(b)}
 function spot(label,x,y,fn,width=10,height=12){const b=document.createElement('button');b.className='hotspot';b.setAttribute('aria-label',label);b.style.left=x+'%';b.style.top=y+'%';b.style.width=width+'%';b.style.height=height+'%';if(label.includes('开关'))b.style.zIndex='2';b.onclick=fn;$('hotspots').append(b)}
-function render(room=state.room){if(state.powerOut&&typeof updatePowerTest==='function')return;if(room==='garden'&&!state.gardenUnlocked){restReminder();return}state.room=room;const data=scenes[room];$('sceneLabel').textContent=data.label;$('clock').textContent=state.firstNight?'21:40':'次日 · 09:10';$('feedback').textContent='';$('hotspots').replaceChildren();$('actions').replaceChildren();$('backdrop').className='backdrop'+(['living','dark'].includes(room)?' interior':'')+(room==='dark'?' dark':'')+(room==='garden'?' garden':'');$('artNotice').hidden=true;$('stage').dataset.room=room;$('turnBack').hidden=!['living','entrance'].includes(room);$('turnBack').setAttribute('aria-label',room==='entrance'?'转身回到客厅':'向后转身，回到大门口');$('turnBack').querySelector('span').textContent=room==='entrance'?'客厅':'大门口';$('backdrop').classList.toggle('entrance',room==='entrance'||room==='dark');
+function render(room=state.room){if(state.powerOut&&typeof updatePowerTest==='function')return;if(!state.firstNight&&!state.dayLightsSet){state.mainLight=true;state.dayLightsSet=true}if(room==='garden'&&!state.gardenUnlocked){restReminder();return}state.room=room;const data=scenes[room];$('sceneLabel').textContent=data.label;$('clock').textContent=state.firstNight?'21:40':'次日 · 09:10';$('feedback').textContent='';$('hotspots').replaceChildren();$('actions').replaceChildren();$('backdrop').className='backdrop'+(['living','dark'].includes(room)?' interior':'')+(room==='dark'?' dark':'')+(room==='garden'?' garden':'');$('artNotice').hidden=true;$('stage').dataset.room=room;$('turnBack').hidden=!['living','entrance'].includes(room);$('turnBack').setAttribute('aria-label',room==='entrance'?'转身回到客厅':'向后转身，回到大门口');$('turnBack').querySelector('span').textContent=room==='entrance'?'客厅':'大门口';$('backdrop').classList.toggle('entrance',room==='entrance'||room==='dark');
  $('backdrop').classList.toggle('upstairs',room==='upstairs');$('goDownstairs').hidden=!['upstairs','bedroom'].includes(room);$('goDownstairs').setAttribute('aria-label',room==='bedroom'?'返回二楼楼道':'返回一楼');$('goDownstairs').querySelector('span').textContent=room==='bedroom'?'返回楼道':'返回一楼';$('backdrop').classList.toggle('bedroom',room==='bedroom');
  updateRoomControls();
  $('backdrop').classList.toggle('day-yard',room==='yard'&&!state.firstNight);
@@ -41,25 +43,26 @@ function render(room=state.room){if(state.powerOut&&typeof updatePowerTest==='fu
  if(room==='living'){
  spot('客厅灯开关',2,39,toggleMainLight,5,12);
  spot('楼梯灯开关',84.8,44,toggleStairLight,5,12);
- spot('爷爷奶奶的卧室',11,48,()=>{if(firstNightAction())return;feedback('你轻轻转动把手。门紧锁着，里面没有回应。');addNote('一楼爷爷奶奶的卧室门紧锁。')},14,60);
+ spot('爷爷奶奶的卧室',11,48,()=>{if(firstNightAction())return;openGrandparentsRoom()},14,60);
  spot('电视',45,50,cycleTv,17,19);
  spot('厨房门',92,48,()=>{if(firstNightAction())return;render('rearHall')},14,65);
- spot(state.picked?'查看手电筒':'拿起手电筒',72,86,()=>{if(firstNightAction())return;if(!state.picked){state.picked=true;addNote('已拿到手电筒。');$('capacity').textContent='1/4'}render('living');feedback('茶几上的手电筒还能用。你把它收进工具箱。')},15,12);
+ if(!state.picked)spot('拿起手电筒',72,86,()=>{if(firstNightAction())return;confirmPickup('flashlight')},15,12);
  spot('上楼',75,48,()=>render('upstairs'),15,48);
  }
  if(room==='entrance'){
  spot('打开大门',50,48,()=>render('yard'),28,56);
  }
  if(room==='bedroom')renderBedroom();
+ if(['grandparents','drawer'].includes(room))renderGrandparentsScene();
  if(room==='upstairs'){
- spot('杂物间',13.4,53,restReminder,7,54);
- spot('通往阁楼的木梯',25,45,restReminder,14,76);
- spot('父母的房间',48,47,restReminder,14,48);
+ spot('杂物间',13.4,53,()=>{if(firstNightAction())return;inspectStorageDoor()},7,54);
+ spot('通往阁楼的木梯',25,45,()=>{if(firstNightAction())return;feedback('阁楼的木板门锁着，今天先不上去。')},14,76);
+ spot('父母的房间',48,47,()=>{if(firstNightAction())return;feedback('先把其他地方检查一下，暂时不进这间房。')},14,48);
  spot('我的房间',75.5,47,()=>render('bedroom'),12,64);
  spot('楼道灯开关',57.2,40.5,toggleHallLight,5,10);
  spot('二楼楼梯灯开关',90.5,55,toggleStairLight,5,10);
  }
-
+ if(typeof saveProgress==='function')saveProgress();
 }
 
 function finish(){if(!$('actions').querySelector('[data-end]')){action('本段结束 · 返回开始界面',home);$('actions').lastElementChild.dataset.end='true'}}
@@ -71,7 +74,7 @@ function phone(){
  $('panelBody').innerHTML='<div class="phone"><div class="phone-label">MOBILE</div><div class="phone-screen">21:40    ▂▄▆\n\n无未接来电\n暂无短信</div></div><p class="panel-note">只能接打电话与收发短信。</p>';
 }
 
-function inventory(){if(typeof openBlackoutInventory==='function'&&openBlackoutInventory())return;if(firstNightAction())return;openPanel('工具箱 · '+(state.picked?'1':'0')+' / 4');const bag=document.createElement('div');bag.className='bag';for(let i=0;i<4;i++){const slot=document.createElement(i===0&&state.picked?'button':'div');slot.className='slot'+(i===0&&state.picked?' occupied':'');if(i===0&&state.picked){slot.innerHTML='<svg aria-hidden="true"><use href="#i-light"/></svg><span>手电筒</span>';slot.onclick=()=>{if(state.room==='dark'){closePanel();feedback('手电照向门口。门缝里看不见人，却传来极轻的呼吸声。');finish()}else{slot.querySelector('span').textContent='手电筒 · 可以使用'}}}else slot.textContent='空位';bag.append(slot)}$('panelBody').append(bag);const p=document.createElement('p');p.className='panel-note';p.textContent='最多携带四件物品。试玩中可拾取一支手电筒。';$('panelBody').append(p)}
+function inventory(){if(typeof openBlackoutInventory==='function'&&openBlackoutInventory())return;if(firstNightAction())return;showInventory()}
 function notes(){
  if(firstNightAction())return;openPanel('备忘录');
  const ul=document.createElement('ul');ul.className='notes';
@@ -132,7 +135,7 @@ function fillPrologue(){
 }
 function enterGame(){
  state.started=true;$('startScreen').hidden=true;$('prologue').hidden=true;$('gameScreen').hidden=false;
- render();$('phoneButton').focus();
+ render();$('capacity').textContent=state.items.length+'/4';$('phoneButton').focus();
 }
 async function beginPrologue(){
  prologuePage=0;prologueBusy=true;$('advancePrologue').disabled=true;
@@ -165,6 +168,7 @@ const tvImages=['','assets/tv-news.svg','assets/tv-movie.svg','assets/tv-cartoon
 function updateRoomControls(){
  const living=state.room==='living';
  const powered=!state.powerOut;
+ $('backdrop').classList.toggle('flashlight-taken',living&&state.picked);
  $('backdrop').classList.toggle('main-light-off',living&&(!state.mainLight||!powered));
  $('backdrop').classList.toggle('entrance-light-off',state.room==='entrance'&&(!state.mainLight||!powered));
  $('unread').hidden=true;

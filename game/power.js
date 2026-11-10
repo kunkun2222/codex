@@ -27,11 +27,12 @@ function triggerPowerCut(){
 function openBlackoutInventory(){
  if(state.powerTestPhase!=='searching'&&state.powerTestPhase!=='ready')return false;
  if(!state.picked){powerGameOver('你没有带上手电筒。');return true}
- openPanel('工具箱 · 1 / 4');
+ openPanel('工具箱 · '+state.items.length+' / 4');
  const bag=document.createElement('div');bag.className='bag';
  const button=document.createElement('button');button.className='slot occupied';button.textContent=state.flashlightReady?'手电筒 · 已取出':'取出手电筒';
  button.onclick=()=>{stopPowerTimer();state.flashlightReady=true;state.powerTestPhase='ready';closePanel();updatePowerTest();feedback('你握住了手电筒。')};bag.append(button);
- for(let i=0;i<3;i++){const empty=document.createElement('div');empty.className='slot';empty.textContent='空位';bag.append(empty)}
+ for(const id of state.items.filter(id=>id!=='flashlight')){const slot=document.createElement('div');slot.className='slot occupied';slot.textContent=itemDefinitions[id].name;bag.append(slot)}
+ for(let i=state.items.length;i<4;i++){const empty=document.createElement('div');empty.className='slot';empty.textContent='空位';bag.append(empty)}
  $('panelBody').append(bag);return true;
 }
 function powerGameOver(reason,jump=true){
